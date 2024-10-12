@@ -45,8 +45,6 @@ public static class GraphicsExtensions
                 var firstControlPoint = edge.FirstControlVertex!.Point;
                 var secondControlPoint = edge.SecondControlVertex!.Point;
 
-                graphics.DrawControlVertex(edge.FirstControlVertex, edge.SecondControlVertex);
-
                 if (algorithmType == AlgorithmType.Library)
                 {
                     graphics.DrawBezier(
@@ -101,6 +99,8 @@ public static class GraphicsExtensions
                         endPoint
                     );
                 }
+
+                graphics.DrawControlVertex(edge.FirstControlVertex, edge.SecondControlVertex);
             }
             else
             {

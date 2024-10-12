@@ -1,4 +1,6 @@
-﻿using PolygonEditor.GUI.Models;
+﻿using PolygonEditor.GUI.Algorithms;
+using PolygonEditor.GUI.Drawing;
+using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
 
 namespace PolygonEditor.GUI;
@@ -163,6 +165,77 @@ public partial class PolygonEditorForm : Form
 
         DynamicContextMenu.Items.Add(bezierItem);
 
+        if (!edge.IsBezier)
+        {
+            var constraintItem = new ToolStripMenuItem("Constraints");
+            foreach (EdgeConstraintType constraintType in Enum.GetValues(typeof(EdgeConstraintType)))
+            {
+                var constraintTypeItem = new ToolStripMenuItem(constraintType.ToString())
+                {
+                    Checked = constraintType == edge.ConstraintType
+                };
+
+                if (constraintType != edge.ConstraintType)
+                {
+                    constraintTypeItem.Click += (s, e) =>
+                    {
+                        edge.ApplyEdgeConstraint(constraintType);
+                    };
+                }
+
+                constraintItem.DropDownItems.Add(constraintTypeItem);
+            }
+
+            DynamicContextMenu.Items.Add(constraintItem);
+        }
+
         DynamicContextMenu.Show(PictureBox, point);
+    }
+
+    private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        CleanUp();
+        Application.Exit();
+    }
+
+    private void PolygonEditorForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        CleanUp();
+    }
+
+    private void CleanUp()
+    {
+        PolygonContainer.Dispose();
+        DrawingStyles.Dispose();
+    }
+
+    private void CustomToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        if (sender is ToolStripMenuItem && !CustomToolStripMenuItem.Checked)
+        {
+            CustomToolStripMenuItem.Checked = true;
+            LibraryToolStripMenuItem.Checked = false;
+
+            AlgorithmType = AlgorithmType.Custom;
+            if (EditorMode == EditorMode.EditingPolygon)
+            {
+                PolygonContainer.DrawPolygon(AlgorithmType);
+            }
+        }
+    }
+
+    private void LibraryToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        if (sender is ToolStripMenuItem && !LibraryToolStripMenuItem.Checked)
+        {
+            LibraryToolStripMenuItem.Checked = true;
+            CustomToolStripMenuItem.Checked = false;
+
+            AlgorithmType = AlgorithmType.Library;
+            if (EditorMode == EditorMode.EditingPolygon)
+            {
+                PolygonContainer.DrawPolygon(AlgorithmType);
+            }
+        }
     }
 }

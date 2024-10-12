@@ -1,4 +1,5 @@
 ﻿using PolygonEditor.GUI.Algorithms;
+using PolygonEditor.GUI.Models.Enums;
 using PolygonEditor.GUI.Models.Interfaces;
 
 namespace PolygonEditor.GUI.Models;
@@ -33,6 +34,7 @@ public sealed class Edge : ISelectable
     public ControlVertex? FirstControlVertex { get; set; }
     public ControlVertex? SecondControlVertex { get; set; }
     public bool IsBezier { get; set; }
+    public EdgeConstraintType ConstraintType { get; set; } = EdgeConstraintType.None;
 
     public double Length
     {
@@ -71,6 +73,12 @@ public sealed class Edge : ISelectable
         }
 
         IsBezier = !IsBezier;
+    }
+
+    public void ApplyEdgeConstraint(EdgeConstraintType constraintType)
+    {
+        ConstraintType = constraintType;
+        // TODO: add logic
     }
 
     private void SetDefaultControlPoints(float k = 0.5f)
