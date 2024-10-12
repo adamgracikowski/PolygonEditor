@@ -35,6 +35,7 @@ partial class PolygonEditorForm
         SaveToolStripMenuItem = new ToolStripMenuItem();
         ClearToolStripMenuItem = new ToolStripMenuItem();
         ExitToolStripMenuItem = new ToolStripMenuItem();
+        CreatePolygonToolStripMenuItem = new ToolStripMenuItem();
         HelpToolStripMenuItem = new ToolStripMenuItem();
         AboutToolStripMenuItem = new ToolStripMenuItem();
         UserGuideToolStripMenuItem = new ToolStripMenuItem();
@@ -55,7 +56,7 @@ partial class PolygonEditorForm
         // 
         // FileToolStripMenuItem
         // 
-        FileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { LoadToolStripMenuItem, SaveToolStripMenuItem, ClearToolStripMenuItem, ExitToolStripMenuItem });
+        FileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { LoadToolStripMenuItem, SaveToolStripMenuItem, ClearToolStripMenuItem, ExitToolStripMenuItem, CreatePolygonToolStripMenuItem });
         FileToolStripMenuItem.Name = "FileToolStripMenuItem";
         FileToolStripMenuItem.Size = new Size(46, 24);
         FileToolStripMenuItem.Text = "&File";
@@ -80,6 +81,7 @@ partial class PolygonEditorForm
         ClearToolStripMenuItem.Name = "ClearToolStripMenuItem";
         ClearToolStripMenuItem.Size = new Size(224, 26);
         ClearToolStripMenuItem.Text = "&Clear";
+        ClearToolStripMenuItem.Click += ClearToolStripMenuItem_Click;
         // 
         // ExitToolStripMenuItem
         // 
@@ -87,6 +89,13 @@ partial class PolygonEditorForm
         ExitToolStripMenuItem.Name = "ExitToolStripMenuItem";
         ExitToolStripMenuItem.Size = new Size(224, 26);
         ExitToolStripMenuItem.Text = "&Exit";
+        // 
+        // CreatePolygonToolStripMenuItem
+        // 
+        CreatePolygonToolStripMenuItem.Name = "CreatePolygonToolStripMenuItem";
+        CreatePolygonToolStripMenuItem.Size = new Size(224, 26);
+        CreatePolygonToolStripMenuItem.Text = "Create Polygon";
+        CreatePolygonToolStripMenuItem.Click += CreatePolygonToolStripMenuItem_Click;
         // 
         // HelpToolStripMenuItem
         // 
@@ -99,14 +108,14 @@ partial class PolygonEditorForm
         // 
         AboutToolStripMenuItem.Image = (Image)resources.GetObject("AboutToolStripMenuItem.Image");
         AboutToolStripMenuItem.Name = "AboutToolStripMenuItem";
-        AboutToolStripMenuItem.Size = new Size(224, 26);
+        AboutToolStripMenuItem.Size = new Size(164, 26);
         AboutToolStripMenuItem.Text = "&About";
         // 
         // UserGuideToolStripMenuItem
         // 
         UserGuideToolStripMenuItem.Image = (Image)resources.GetObject("UserGuideToolStripMenuItem.Image");
         UserGuideToolStripMenuItem.Name = "UserGuideToolStripMenuItem";
-        UserGuideToolStripMenuItem.Size = new Size(224, 26);
+        UserGuideToolStripMenuItem.Size = new Size(164, 26);
         UserGuideToolStripMenuItem.Text = "&User Guide";
         // 
         // PictureBox
@@ -117,6 +126,9 @@ partial class PolygonEditorForm
         PictureBox.Size = new Size(782, 525);
         PictureBox.TabIndex = 1;
         PictureBox.TabStop = false;
+        PictureBox.MouseClick += PictureBox_MouseClick;
+        PictureBox.MouseDown += PictureBox_MouseDown;
+        PictureBox.MouseMove += PictureBox_MouseMove;
         // 
         // PolygonEditorForm
         // 
@@ -147,4 +159,5 @@ partial class PolygonEditorForm
     private ToolStripMenuItem AboutToolStripMenuItem;
     private ToolStripMenuItem UserGuideToolStripMenuItem;
     private PictureBox PictureBox;
+    private ToolStripMenuItem CreatePolygonToolStripMenuItem;
 }
