@@ -28,18 +28,28 @@ public sealed class PolygonContainer : IDisposable
         graphicsBuffer.Clear(DrawingStyles.BackgroundColor);
     }
 
-    public void Dispose()
+    private void Resize()
+    {
+        // TODO: add logic when picture box is resized
+    }
+
+    private void DisposeBitmas()
     {
         Buffer.Dispose();
         PictureBox.Image?.Dispose();
     }
 
+    public void Dispose()
+    {
+        DisposeBitmas();
+    }
+
     public void DrawPartialPolygon(Point point, AlgorithmType algorithmType)
     {
         using var graphics = Graphics.FromImage(Buffer);
-        graphics.DrawVertex([..CachedVertices]);
         graphics.DrawEdge(algorithmType, [.. CachedEdges]);
         graphics.DrawEdge(algorithmType, CachedVertices[^1], point);
+        graphics.DrawVertex([..CachedVertices]);
 
         SwapBitmaps();
         ClearBuffer();
@@ -97,7 +107,6 @@ public sealed class PolygonContainer : IDisposable
             return;
 
         using var graphics = Graphics.FromImage(Buffer);
-        graphics.DrawVertex([.. Polygon.Vertices]);
         graphics.DrawEdge(algorithmType, [.. Polygon.Edges]);
         graphics.FillPolygon(
             DrawingStyles.PolygonFillBrush,
@@ -105,6 +114,7 @@ public sealed class PolygonContainer : IDisposable
                 .Select(v => new PointF(v.X, v.Y))
                 .ToArray()
         );
+        graphics.DrawVertex([.. Polygon.Vertices]);
 
         SwapBitmaps();
         ClearBuffer();

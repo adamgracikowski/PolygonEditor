@@ -1,6 +1,7 @@
 ﻿using PolygonEditor.GUI.Algorithms;
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
+using System.Drawing;
 
 namespace PolygonEditor.GUI.Drawing;
 
@@ -38,7 +39,7 @@ public static class GraphicsExtensions
         foreach (var edge in edges)
         {
             var startPoint = edge.Start.Point;
-            var endPoint =edge.End.Point;
+            var endPoint = edge.End.Point;
 
             if (edge.IsBezier)
             {
@@ -47,6 +48,26 @@ public static class GraphicsExtensions
 
                 if (algorithmType == AlgorithmType.Library)
                 {
+                    graphics.DrawLine(
+                        DrawingStyles.BezierEdgePen,
+                        startPoint,
+                        firstControlPoint
+                    );
+                    graphics.DrawLine(
+                        DrawingStyles.BezierEdgePen,
+                        firstControlPoint,
+                        secondControlPoint
+                    );
+                    graphics.DrawLine(
+                        DrawingStyles.BezierEdgePen,
+                        secondControlPoint,
+                        endPoint
+                    );
+                    graphics.DrawLine(
+                        DrawingStyles.BezierEdgePen,
+                        startPoint,
+                        endPoint
+                    );
                     graphics.DrawBezier(
                         DrawingStyles.BezierCurvePen,
                         startPoint,
@@ -54,30 +75,9 @@ public static class GraphicsExtensions
                         secondControlPoint,
                         endPoint
                     );
-                    graphics.DrawLine(
-                        DrawingStyles.BezierEdgePen,
-                        startPoint,
-                        firstControlPoint
-                    );
-                    graphics.DrawLine(
-                        DrawingStyles.BezierEdgePen,
-                        firstControlPoint,
-                        secondControlPoint
-                    );
-                    graphics.DrawLine(
-                        DrawingStyles.BezierEdgePen,
-                        secondControlPoint,
-                        endPoint
-                    );
-                    graphics.DrawLine(
-                        DrawingStyles.BezierEdgePen,
-                        startPoint,
-                        endPoint
-                    );
                 }
                 else if (algorithmType == AlgorithmType.Custom)
                 {
-                    // TODO
                     graphics.DrawBresenhamLine(
                         DrawingStyles.BezierEdgePen,
                         startPoint,
@@ -96,6 +96,13 @@ public static class GraphicsExtensions
                     graphics.DrawBresenhamLine(
                         DrawingStyles.BezierEdgePen,
                         startPoint,
+                        endPoint
+                    );
+                    graphics.DrawBezierLine(
+                        DrawingStyles.BezierCurvePen,
+                        startPoint,
+                        firstControlPoint,
+                        secondControlPoint,
                         endPoint
                     );
                 }
@@ -147,6 +154,32 @@ public static class GraphicsExtensions
         foreach (var point in Algorithm.BresenhamPoints(pt1.X, pt1.Y, pt2.X, pt2.Y))
         {
             graphics.DrawRectangle(pen, point.X, point.Y, 1, 1);
+        }
+    }
+    public static void DrawBezierLine(this Graphics graphics, Pen pen, Point p1, Point p2, Point p3, Point p4)
+    {
+        float t = 0;
+        int steps = PolygonEditorConstants.BezierStep;
+        float dt = 1f / steps;
+
+        Point prevPoint = p1;
+
+        for (var i = 1; i <= steps; i++)
+        {
+            t += dt;
+
+            var a = Math.Pow(1 - t, 3);
+            var b = 3 * t * Math.Pow(1 - t, 2);
+            var c = Math.Pow(t, 3);
+            var d = 3 * (1 - t) * Math.Pow(t, 2);
+
+            int x = (int)Math.Round(a * p1.X + b * p2.X + d * p3.X + c * p4.X);
+            int y = (int)Math.Round(a * p1.Y + b * p2.Y + d * p3.Y + c * p4.Y);
+
+            var newPoint = new Point(x, y);
+
+            graphics.DrawBresenhamLine(pen, prevPoint, newPoint);
+            prevPoint = newPoint;
         }
     }
 }

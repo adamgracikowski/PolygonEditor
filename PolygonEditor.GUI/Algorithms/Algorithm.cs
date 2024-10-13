@@ -1,4 +1,6 @@
-﻿namespace PolygonEditor.GUI.Algorithms;
+﻿using System.Drawing;
+
+namespace PolygonEditor.GUI.Algorithms;
 
 public static class Algorithm
 {
