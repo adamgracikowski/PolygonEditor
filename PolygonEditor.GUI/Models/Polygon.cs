@@ -1,6 +1,5 @@
 ﻿using PolygonEditor.GUI.Models.Interfaces;
 using System.Drawing.Drawing2D;
-using System.Runtime.CompilerServices;
 
 namespace PolygonEditor.GUI.Models;
 

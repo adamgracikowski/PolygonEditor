@@ -34,8 +34,6 @@ public static class GraphicsExtensions
     {
         graphics.DrawVertexBase(DrawingStyles.ControlVertexBrush, vertices);
     }
-
-
     public static void DrawEdge(this Graphics graphics, AlgorithmType algorithmType, params Edge[] edges)
     {
         foreach (var edge in edges)
@@ -184,7 +182,6 @@ public static class GraphicsExtensions
             prevPoint = newPoint;
         }
     }
-
     public static void DrawEdgeConstraints(this Graphics graphics, params Edge[] edges)
     {
         foreach (var edge in edges)
@@ -197,8 +194,7 @@ public static class GraphicsExtensions
             graphics.DrawIcon(edge.ConstraintType, x, y);
         }
     }
-
-    public static void DrawIcon(this Graphics graphics, EdgeConstraintType constraintType, int x, int y)
+    private static void DrawIcon(this Graphics graphics, EdgeConstraintType constraintType, int x, int y)
     {
         Image? icon = constraintType switch
         {
@@ -212,7 +208,6 @@ public static class GraphicsExtensions
 
         graphics.DrawImage(icon, x, y, icon.Width, icon.Height);
     }
-
     public static void DrawVertexConstraint(this Graphics graphics, params Vertex[] vertices)
     {
         foreach (var vertex in vertices)
@@ -226,8 +221,7 @@ public static class GraphicsExtensions
             );
         }
     }
-
-    public static void DrawText(this Graphics graphics, string text, int x, int y)
+    private static void DrawText(this Graphics graphics, string text, int x, int y)
     {
         var font = DrawingStyles.ConstraintFont;
         var brush = DrawingStyles.ConstraintBrush;

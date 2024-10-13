@@ -1,5 +1,4 @@
-﻿using PolygonEditor.GUI.Algorithms;
-using PolygonEditor.GUI.Drawing;
+﻿using PolygonEditor.GUI.Drawing;
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
 

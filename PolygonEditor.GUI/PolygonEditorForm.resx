@@ -157,6 +157,25 @@
         6I+M+FzSIAfTc7nbD7DWXGUmih7TR0I4ACfYKYpe5HEtAAAAAElFTkSuQmCC
 </value>
   </data>
+  <data name="CreatePolygonToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAC4SURBVDhPtdI7CgIxFIXhCJZaCDZ2PrYhig/EDdi5Ebdg
+        Y+ESREELKzdiqZvR/8zokIhJJoIHPiYM5MxNGPNjehjny/RUccUDE71IyRBrtKGSLrJRLjgFbDHDHjWo
+        RJNkWWKeL73p44g6VDJCkViBxn5/WU9N4iRUMIC9WWUbOPEV+MbevZ5FvhWEzhwtqOCGJg7QMexECzrQ
+        T3LH52YlWtCASnwpdQeh/KdghWlJZzhpYZHAulhjnp/3LRRnmuDDAAAAAElFTkSuQmCC
+</value>
+  </data>
+  <data name="AlgorithmToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAACxIAAAsSAdLdfvwAAADNSURBVDhPpdMxDgFBGIbhLUWUKo1Ep6BRq1xDJ6HRSHQ6
+        Ie6gJkEkKNxB4Qx7Fu8rs4lgBfMlT+z+Zmb/nd1N/kgLV6yQWvg2DfQxw8gCcZG3aeIIB5wsECf1Av/z
+        3E5eMsASXs1sMMEZtl8Mv5mX7NGFrTrAiXUswnkF8wdJ+0EJtu0gW9QQxuN1MEUVByQX2O4WXiFvYwoo
+        owMXM/ex2QSLY2Sblpca3Bfn7SxELxB9C9Gb+JyfH+Nzol8kE/Uq5+Wnj+lTbDt8zkl6A4oyQs/EgmHh
+        AAAAAElFTkSuQmCC
+</value>
+  </data>
   <data name="AboutToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL

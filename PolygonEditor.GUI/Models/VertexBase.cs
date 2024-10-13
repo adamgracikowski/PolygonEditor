@@ -41,7 +41,6 @@ public abstract class VertexBase : ISelectable
         var r = PolygonEditorConstants.HitRadius;
         return Geometry.IsNear(X, Y, x, y, r);
     }
-
     public void MoveWithoutConstraint(int dx, int dy)
     {
         Point = new Point(Point.X + dx, Point.Y + dy);

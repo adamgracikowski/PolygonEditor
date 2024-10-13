@@ -2,7 +2,7 @@
 
 public enum EdgeConstraintType
 {
-    None = 0,
+    None,
     Horizontal,
     Vertical,
     FixedLength
