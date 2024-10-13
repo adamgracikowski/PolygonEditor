@@ -32,11 +32,74 @@ public partial class PolygonEditorForm : Form
         {
             PolygonContainer.DrawPartialPolygon(e.Location, AlgorithmType);
         }
+        else if (EditorMode == EditorMode.MovingPolygon)
+        {
+            PolygonContainer.MovePolygon(e.Location);
+            PolygonContainer.DrawPolygon(AlgorithmType);
+        }
+        else if (EditorMode == EditorMode.MovingVertex)
+        {
+            PolygonContainer.MoveSelectedVertex(e.Location);
+            PolygonContainer.DrawPolygon(AlgorithmType);
+        }
+        else if (EditorMode == EditorMode.MovingControlVertex)
+        {
+            PolygonContainer.MoveSelectedControlVertex(e.Location);
+            PolygonContainer.DrawPolygon(AlgorithmType);
+        }
     }
 
     private void PictureBox_MouseDown(object sender, MouseEventArgs e)
     {
+        if (EditorMode == EditorMode.EditingPolygon && e.Button == MouseButtons.Left)
+        {
+            if (PolygonContainer.IsVertexHit(e.Location, out var vertex) && vertex != null)
+            {
+                EditorMode = EditorMode.MovingVertex;
+                PolygonContainer.VertexMovingState.SelectedElement = vertex;
+                PolygonContainer.VertexMovingState.HitPoint = e.Location;
+            }
+            if (PolygonContainer.IsControlVertexHit(e.Location, out var controlVertex) && controlVertex != null)
+            {
+                EditorMode = EditorMode.MovingControlVertex;
+                PolygonContainer.ControlVertexMovingState.SelectedElement = controlVertex;
+                PolygonContainer.ControlVertexMovingState.HitPoint = e.Location;
+            }
+            else if (PolygonContainer.IsPolygonHit(e.Location, out var polygon) && polygon != null)
+            {
+                EditorMode = EditorMode.MovingPolygon;
+                PolygonContainer.PolygonMovingState.SelectedElement = polygon;
+                PolygonContainer.PolygonMovingState.HitPoint = e.Location;
+            }
+        }
+    }
 
+    private void PictureBox_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (sender != PictureBox ||
+            EditorMode == EditorMode.CreatingPolygon ||
+            EditorMode == EditorMode.EditingPolygon)
+        {
+            return;
+        }
+
+        if (e.Button == MouseButtons.Left)
+        {
+            if (EditorMode == EditorMode.MovingPolygon)
+            {
+                PolygonContainer.PolygonMovingState.Clear();
+            }
+            else if (EditorMode == EditorMode.MovingVertex)
+            {
+                PolygonContainer.VertexMovingState.Clear();
+            }
+            else if (EditorMode == EditorMode.MovingControlVertex)
+            {
+                PolygonContainer.ControlVertexMovingState.Clear();
+            }
+
+            EditorMode = EditorMode.EditingPolygon;
+        }
     }
 
     private void PictureBox_MouseClick(object sender, MouseEventArgs e)
@@ -233,7 +296,7 @@ public partial class PolygonEditorForm : Form
                 {
                     constraintTypeItem.Click += (s, e) =>
                     {
-                        if(constraintType == EdgeConstraintType.Horizontal &&
+                        if (constraintType == EdgeConstraintType.Horizontal &&
                            !edge.CanApplyHorizontalConstraint)
                         {
                             MessageBox.Show(
@@ -245,7 +308,7 @@ public partial class PolygonEditorForm : Form
 
                             return;
                         }
-                        else if(constraintType == EdgeConstraintType.Vertical &&
+                        else if (constraintType == EdgeConstraintType.Vertical &&
                             !edge.CanApplyVerticalConstraint)
                         {
                             MessageBox.Show(
@@ -288,7 +351,7 @@ public partial class PolygonEditorForm : Form
     }
     private void PolygonEditorForm_KeyDown(object sender, KeyEventArgs e)
     {
-        if(e.KeyCode == Keys.Escape && EditorMode == EditorMode.CreatingPolygon)
+        if (e.KeyCode == Keys.Escape && EditorMode == EditorMode.CreatingPolygon)
         {
             PolygonContainer.ClearContainer();
         }

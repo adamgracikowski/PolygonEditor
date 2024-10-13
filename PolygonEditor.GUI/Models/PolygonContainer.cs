@@ -10,6 +10,9 @@ public sealed class PolygonContainer : IDisposable
     public List<Edge> CachedEdges = [];
     public Bitmap Buffer { get; set; }
     public PictureBox PictureBox { get; set; }
+    public MovingState<Vertex> VertexMovingState { get; } = new();
+    public MovingState<ControlVertex> ControlVertexMovingState { get; } = new();
+    public MovingState<Polygon> PolygonMovingState { get; } = new();
 
     public PolygonContainer(PictureBox pictureBox)
     {
@@ -25,6 +28,26 @@ public sealed class PolygonContainer : IDisposable
 
         PictureBox.Image = bitmap;
         PictureBox.Refresh();
+    }
+
+    public void MovePolygon(Point point)
+    {
+        var (dx, dy) = PolygonMovingState.UpdateHitPoint(point);
+        Polygon?.MoveWithoutConstraint(dx, dy);
+    }
+
+    public void MoveSelectedVertex(Point point)
+    {
+        var (dx, dy) = VertexMovingState.UpdateHitPoint(point);
+        var vertex = VertexMovingState.SelectedElement;
+        vertex?.MoveWithoutConstraint(dx, dy);
+    }
+
+    public void MoveSelectedControlVertex(Point point)
+    {
+        var (dx, dy) = ControlVertexMovingState.UpdateHitPoint(point);
+        var controlVertex = ControlVertexMovingState.SelectedElement;
+        controlVertex?.MoveWithoutConstraint(dx, dy);
     }
 
     public void Resize(AlgorithmType algorithmType)
@@ -108,6 +131,29 @@ public sealed class PolygonContainer : IDisposable
     {
         vertex = Polygon?.Vertices.FirstOrDefault(v => v.IsWithinSelection(point.X, point.Y));
         return vertex != null;
+    }
+    public bool IsControlVertexHit(Point point, out ControlVertex? controlVertex)
+    {
+        controlVertex = null;
+
+        if (Polygon == null)
+            return false;
+
+        foreach(var edge in Polygon.Edges)
+        {
+            if(edge.FirstControlVertex != null && edge.FirstControlVertex.IsWithinSelection(point.X, point.Y))
+            {
+                controlVertex = edge.FirstControlVertex;
+                return true;
+            }
+            if (edge.SecondControlVertex != null && edge.SecondControlVertex.IsWithinSelection(point.X, point.Y))
+            {
+                controlVertex = edge.SecondControlVertex;
+                return true;
+            }
+        }
+
+        return false;
     }
     public bool IsEdgeHit(Point point, out Edge? edge)
     {

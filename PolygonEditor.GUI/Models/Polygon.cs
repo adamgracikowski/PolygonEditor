@@ -1,5 +1,6 @@
 ﻿using PolygonEditor.GUI.Models.Interfaces;
 using System.Drawing.Drawing2D;
+using System.Runtime.CompilerServices;
 
 namespace PolygonEditor.GUI.Models;
 
@@ -73,6 +74,19 @@ public sealed class Polygon : ISelectable
 
         Edges.Insert(edgeIndex, firstEdge);
         Edges.Insert(edgeIndex + 1, secondEdge);
+    }
+    public void MoveWithoutConstraint(int dx, int dy)
+    {
+        Vertices.ForEach(vertex => vertex.MoveWithoutConstraint(dx, dy));
+
+        Edges.ForEach(edge =>
+        {
+            if(edge.IsBezier && edge.FirstControlVertex != null && edge.SecondControlVertex != null)
+            {
+                edge.FirstControlVertex.MoveWithoutConstraint(dx, dy);
+                edge.SecondControlVertex.MoveWithoutConstraint(dx, dy);
+            }
+        });
     }
     public bool IsWithinSelection(int x, int y)
     {

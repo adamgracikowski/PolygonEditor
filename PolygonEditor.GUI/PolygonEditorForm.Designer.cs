@@ -156,6 +156,7 @@ partial class PolygonEditorForm
         PictureBox.MouseClick += PictureBox_MouseClick;
         PictureBox.MouseDown += PictureBox_MouseDown;
         PictureBox.MouseMove += PictureBox_MouseMove;
+        PictureBox.MouseUp += PictureBox_MouseUp;
         // 
         // PolygonEditorForm
         // 

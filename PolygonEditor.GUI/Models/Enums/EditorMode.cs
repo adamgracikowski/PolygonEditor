@@ -4,5 +4,8 @@ public enum EditorMode
 {
     None,
     CreatingPolygon,
-    EditingPolygon
+    EditingPolygon,
+    MovingPolygon,
+    MovingVertex,
+    MovingControlVertex
 }
