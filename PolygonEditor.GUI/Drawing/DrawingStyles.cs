@@ -16,6 +16,7 @@ public static class DrawingStyles
     public static readonly SolidBrush BezierCurveBrush = new(Color.Red);
     public static readonly SolidBrush BezierEdgeBrush = new(Color.LightGray);
     public static readonly SolidBrush BackgroundBrush = new(Color.White);
+    public static readonly SolidBrush ConstraintBrush = new(Color.Black);
     public static readonly SolidBrush PolygonFillBrush 
         = new(Color.FromArgb(PolygonFillOpacity, PolygonFillColor));
 
@@ -23,6 +24,9 @@ public static class DrawingStyles
     public static readonly Pen EdgePen = new(EdgeBrush);
     public static readonly Pen BezierEdgePen = new(BezierEdgeBrush);
     public static readonly Pen BezierCurvePen = new(BezierCurveBrush);
+
+    // Fonts:
+    public static readonly Font ConstraintFont = new("Calibri", 10);
 
     public static void Dispose()
     {
@@ -33,11 +37,15 @@ public static class DrawingStyles
         BezierCurveBrush.Dispose();
         BezierEdgeBrush.Dispose();
         BackgroundBrush.Dispose();
+        ConstraintBrush.Dispose();
         PolygonFillBrush.Dispose();
 
         // Pens:
         EdgePen.Dispose();
         BezierEdgePen.Dispose();
         BezierCurvePen.Dispose();
+
+        // Fonts:
+        ConstraintFont.Dispose();
     }
 }

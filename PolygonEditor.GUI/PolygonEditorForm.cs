@@ -60,8 +60,13 @@ public partial class PolygonEditorForm : Form
             {
                 CreateEdgeContextMenu(edge, e.Location);
             }
+            else if (PolygonContainer.IsPolygonHit(e.Location, out var polygon) && polygon != null)
+            {
+                CreatePolygonContextMenu(polygon, e.Location);
+            }
         }
     }
+
     private void ClearToolStripMenuItem_Click(object sender, EventArgs e)
     {
         ClearWithMessage();
@@ -84,113 +89,7 @@ public partial class PolygonEditorForm : Form
         return true;
     }
 
-    private void CreateVertexContextMenu(Vertex vertex, Point point)
-    {
-        DynamicContextMenu.Items.Clear();
-        var deleteItem = new ToolStripMenuItem("Delete vertex");
-        deleteItem.Click += (s, e) =>
-        {
-            if (PolygonContainer.Polygon == null)
-                return;
 
-            if (PolygonContainer.Polygon.DeleteVertex(vertex))
-            {
-                PolygonContainer.DrawPolygon(AlgorithmType);
-                return;
-            }
-
-            MessageBox.Show(
-                "Polygon must have at least 3 vertices.",
-                "Invalid operation",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Exclamation
-            );
-        };
-
-        DynamicContextMenu.Items.Add(deleteItem);
-
-        if (vertex.CanApplyConstraint)
-        {
-            var constraintItem = new ToolStripMenuItem("Constraints");
-            foreach (VertexConstraintType constraintType in Enum.GetValues(typeof(VertexConstraintType)))
-            {
-                var constraintTypeItem = new ToolStripMenuItem(constraintType.ToString())
-                {
-                    Checked = constraintType == vertex.ConstraintType
-                };
-
-                if (constraintType != vertex.ConstraintType)
-                {
-                    constraintTypeItem.Click += (s, e) =>
-                    {
-                        vertex.ApplyVertexConstraint(constraintType);
-                    };
-                }
-
-                constraintItem.DropDownItems.Add(constraintTypeItem);
-            }
-
-            DynamicContextMenu.Items.Add(constraintItem);
-        }
-
-        DynamicContextMenu.Show(PictureBox, vertex.Point);
-    }
-
-    private void CreateEdgeContextMenu(Edge edge, Point point)
-    {
-        DynamicContextMenu.Items.Clear();
-
-        var addVertexItem = new ToolStripMenuItem("Add vertex");
-        addVertexItem.Click += (s, e) =>
-        {
-            if (PolygonContainer.Polygon == null)
-                return;
-
-            PolygonContainer.Polygon.AddVertex(edge);
-            PolygonContainer.DrawPolygon(AlgorithmType);
-        };
-
-        DynamicContextMenu.Items.Add(addVertexItem);
-
-        var bezierItem = new ToolStripMenuItem("Bezier")
-        {
-            Checked = edge.IsBezier
-        };
-
-        bezierItem.Click += (s, e) =>
-        {
-            edge.ToggleBezier();
-            PolygonContainer.DrawPolygon(AlgorithmType);
-        };
-
-        DynamicContextMenu.Items.Add(bezierItem);
-
-        if (!edge.IsBezier)
-        {
-            var constraintItem = new ToolStripMenuItem("Constraints");
-            foreach (EdgeConstraintType constraintType in Enum.GetValues(typeof(EdgeConstraintType)))
-            {
-                var constraintTypeItem = new ToolStripMenuItem(constraintType.ToString())
-                {
-                    Checked = constraintType == edge.ConstraintType
-                };
-
-                if (constraintType != edge.ConstraintType)
-                {
-                    constraintTypeItem.Click += (s, e) =>
-                    {
-                        edge.ApplyEdgeConstraint(constraintType);
-                    };
-                }
-
-                constraintItem.DropDownItems.Add(constraintTypeItem);
-            }
-
-            DynamicContextMenu.Items.Add(constraintItem);
-        }
-
-        DynamicContextMenu.Show(PictureBox, point);
-    }
 
     private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
     {
@@ -236,6 +135,162 @@ public partial class PolygonEditorForm : Form
             {
                 PolygonContainer.DrawPolygon(AlgorithmType);
             }
+        }
+    }
+
+    private void CreateVertexContextMenu(Vertex vertex, Point point)
+    {
+        DynamicContextMenu.Items.Clear();
+        var deleteItem = new ToolStripMenuItem("Delete vertex");
+        deleteItem.Click += (s, e) =>
+        {
+            if (PolygonContainer.Polygon == null)
+                return;
+
+            if (PolygonContainer.Polygon.DeleteVertex(vertex))
+            {
+                PolygonContainer.DrawPolygon(AlgorithmType);
+                return;
+            }
+
+            MessageBox.Show(
+                "Polygon must have at least 3 vertices.",
+                "Invalid operation",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation
+            );
+        };
+
+        DynamicContextMenu.Items.Add(deleteItem);
+
+        if (vertex.CanApplyConstraint)
+        {
+            var constraintItem = new ToolStripMenuItem("Constraints");
+            foreach (VertexConstraintType constraintType in Enum.GetValues(typeof(VertexConstraintType)))
+            {
+                var constraintTypeItem = new ToolStripMenuItem(constraintType.ToString())
+                {
+                    Checked = constraintType == vertex.ConstraintType
+                };
+
+                if (constraintType != vertex.ConstraintType)
+                {
+                    constraintTypeItem.Click += (s, e) =>
+                    {
+                        vertex.ApplyVertexConstraint(constraintType);
+                        PolygonContainer.DrawPolygon(AlgorithmType);
+                    };
+                }
+
+                constraintItem.DropDownItems.Add(constraintTypeItem);
+            }
+
+            DynamicContextMenu.Items.Add(constraintItem);
+        }
+
+        DynamicContextMenu.Show(PictureBox, vertex.Point);
+    }
+    private void CreateEdgeContextMenu(Edge edge, Point point)
+    {
+        DynamicContextMenu.Items.Clear();
+
+        var addVertexItem = new ToolStripMenuItem("Add vertex");
+        addVertexItem.Click += (s, e) =>
+        {
+            if (PolygonContainer.Polygon == null)
+                return;
+
+            PolygonContainer.Polygon.AddVertex(edge);
+            PolygonContainer.DrawPolygon(AlgorithmType);
+        };
+
+        DynamicContextMenu.Items.Add(addVertexItem);
+
+        var bezierItem = new ToolStripMenuItem("Bezier")
+        {
+            Checked = edge.IsBezier
+        };
+
+        bezierItem.Click += (s, e) =>
+        {
+            edge.ToggleBezier();
+            PolygonContainer.DrawPolygon(AlgorithmType);
+        };
+
+        DynamicContextMenu.Items.Add(bezierItem);
+
+        if (!edge.IsBezier)
+        {
+            var constraintItem = new ToolStripMenuItem("Constraints");
+            foreach (EdgeConstraintType constraintType in Enum.GetValues(typeof(EdgeConstraintType)))
+            {
+                var constraintTypeItem = new ToolStripMenuItem(constraintType.ToString())
+                {
+                    Checked = constraintType == edge.ConstraintType
+                };
+
+                if (constraintType != edge.ConstraintType)
+                {
+                    constraintTypeItem.Click += (s, e) =>
+                    {
+                        if(constraintType == EdgeConstraintType.Horizontal &&
+                           !edge.CanApplyHorizontalConstraint)
+                        {
+                            MessageBox.Show(
+                                "Adjacent edge is already horizontal.",
+                                "Invalid operation",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information
+                            );
+
+                            return;
+                        }
+                        else if(constraintType == EdgeConstraintType.Vertical &&
+                            !edge.CanApplyVerticalConstraint)
+                        {
+                            MessageBox.Show(
+                                "Adjacent edge is already vertical.",
+                                "Invalid operation",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information
+                            );
+
+                            return;
+                        }
+
+                        edge.ApplyEdgeConstraint(constraintType);
+                        PolygonContainer.DrawPolygon(AlgorithmType);
+                    };
+                }
+
+                constraintItem.DropDownItems.Add(constraintTypeItem);
+            }
+
+            DynamicContextMenu.Items.Add(constraintItem);
+        }
+
+        DynamicContextMenu.Show(PictureBox, point);
+    }
+    private void CreatePolygonContextMenu(Polygon polygon, Point point)
+    {
+        DynamicContextMenu.Items.Clear();
+        var deleteItem = new ToolStripMenuItem("Delete polygon");
+        deleteItem.Click += (s, e) =>
+        {
+            if (PolygonContainer.Polygon == null)
+                return;
+
+            PolygonContainer.ClearContainer();
+        };
+
+        DynamicContextMenu.Items.Add(deleteItem);
+        DynamicContextMenu.Show(PictureBox, point);
+    }
+    private void PolygonEditorForm_KeyDown(object sender, KeyEventArgs e)
+    {
+        if(e.KeyCode == Keys.Escape && EditorMode == EditorMode.CreatingPolygon)
+        {
+            PolygonContainer.ClearContainer();
         }
     }
 }

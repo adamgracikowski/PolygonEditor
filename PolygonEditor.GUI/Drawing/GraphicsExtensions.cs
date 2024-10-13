@@ -1,7 +1,9 @@
 ﻿using PolygonEditor.GUI.Algorithms;
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
+using PolygonEditor.GUI.Properties;
 using System.Drawing;
+using System.Reflection;
 
 namespace PolygonEditor.GUI.Drawing;
 
@@ -181,5 +183,55 @@ public static class GraphicsExtensions
             graphics.DrawBresenhamLine(pen, prevPoint, newPoint);
             prevPoint = newPoint;
         }
+    }
+
+    public static void DrawEdgeConstraints(this Graphics graphics, params Edge[] edges)
+    {
+        foreach (var edge in edges)
+        {
+            if (edge.IsBezier || edge.ConstraintType == EdgeConstraintType.None) continue;
+
+            var x = (edge.Start.X + edge.End.X) / 2;
+            var y = (edge.Start.Y + edge.End.Y) / 2;
+
+            graphics.DrawIcon(edge.ConstraintType, x, y);
+        }
+    }
+
+    public static void DrawIcon(this Graphics graphics, EdgeConstraintType constraintType, int x, int y)
+    {
+        Image? icon = constraintType switch
+        {
+            EdgeConstraintType.Horizontal => Resources.horizontal,
+            EdgeConstraintType.Vertical => Resources.vertical,
+            EdgeConstraintType.FixedLength => Resources.ruler,
+            _ => null
+        };
+
+        if (icon == null) return;
+
+        graphics.DrawImage(icon, x, y, icon.Width, icon.Height);
+    }
+
+    public static void DrawVertexConstraint(this Graphics graphics, params Vertex[] vertices)
+    {
+        foreach (var vertex in vertices)
+        {
+            if (vertex.ConstraintType == VertexConstraintType.None) continue;
+
+            graphics.DrawText(
+                vertex.ConstraintType.ToString(),
+                vertex.Point.X + 4,
+                vertex.Point.Y + 4
+            );
+        }
+    }
+
+    public static void DrawText(this Graphics graphics, string text, int x, int y)
+    {
+        var font = DrawingStyles.ConstraintFont;
+        var brush = DrawingStyles.ConstraintBrush;
+        var textSize = TextRenderer.MeasureText(text, font);
+        graphics.DrawString(text, font, brush, new Rectangle(x, y, textSize.Width, textSize.Height));
     }
 }

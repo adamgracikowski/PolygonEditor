@@ -36,6 +36,28 @@ public sealed class Edge : ISelectable
     public bool IsBezier { get; set; }
     public EdgeConstraintType ConstraintType { get; set; } = EdgeConstraintType.None;
 
+    public bool CanApplyHorizontalConstraint
+    {
+        get
+        {
+            return !IsBezier &&
+                Start.FirstEdge != null &&
+                Start.FirstEdge.ConstraintType != EdgeConstraintType.Horizontal &&
+                End.SecondEdge != null &&
+                End.SecondEdge.ConstraintType != EdgeConstraintType.Horizontal;
+        }
+    }
+    public bool CanApplyVerticalConstraint
+    {
+        get
+        {
+            return !IsBezier &&
+                Start.FirstEdge != null &&
+                Start.FirstEdge.ConstraintType != EdgeConstraintType.Vertical &&
+                End.SecondEdge != null &&
+                End.SecondEdge.ConstraintType != EdgeConstraintType.Vertical;
+        }
+    }
     public double Length
     {
         get
@@ -69,6 +91,7 @@ public sealed class Edge : ISelectable
         }
         else
         {
+            ConstraintType = EdgeConstraintType.None;
             SetDefaultControlPoints();
         }
 
@@ -77,6 +100,9 @@ public sealed class Edge : ISelectable
 
     public void ApplyEdgeConstraint(EdgeConstraintType constraintType)
     {
+        if (ConstraintType == constraintType)
+            return;
+
         ConstraintType = constraintType;
         // TODO: add logic
     }

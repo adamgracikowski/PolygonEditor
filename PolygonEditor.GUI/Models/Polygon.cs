@@ -1,6 +1,9 @@
-﻿namespace PolygonEditor.GUI.Models;
+﻿using PolygonEditor.GUI.Models.Interfaces;
+using System.Drawing.Drawing2D;
 
-public sealed class Polygon
+namespace PolygonEditor.GUI.Models;
+
+public sealed class Polygon : ISelectable
 {
     public Polygon(List<Vertex> vertices, List<Edge> edges)
     {
@@ -41,7 +44,6 @@ public sealed class Polygon
 
         return true;
     }
-
     public void AddVertex(Edge edge)
     {
         if (edge == null ||
@@ -71,5 +73,11 @@ public sealed class Polygon
 
         Edges.Insert(edgeIndex, firstEdge);
         Edges.Insert(edgeIndex + 1, secondEdge);
+    }
+    public bool IsWithinSelection(int x, int y)
+    {
+        using var graphicsPath = new GraphicsPath();
+        graphicsPath.AddPolygon(Vertices.Select(v => v.Point).ToArray());
+        return graphicsPath.IsVisible(x, y);
     }
 }
