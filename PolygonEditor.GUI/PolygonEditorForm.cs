@@ -48,7 +48,8 @@ public partial class PolygonEditorForm : Form
         }
         else if (EditorMode == EditorMode.MovingControlVertex)
         {
-            PolygonContainer.MoveSelectedControlVertex(e.Location);
+            //PolygonContainer.MoveSelectedControlVertex(e.Location);
+            PolygonContainer.MoveSelectedControlVertexWithConstraints(e.Location);
             PolygonContainer.DrawPolygon(AlgorithmType);
         }
     }

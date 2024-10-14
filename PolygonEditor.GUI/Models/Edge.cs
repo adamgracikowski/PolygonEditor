@@ -107,6 +107,11 @@ public sealed class Edge : ISelectable
         if (ConstraintType == constraintType)
             return;
 
+        if(constraintType == EdgeConstraintType.FixedLength)
+        {
+            FixedLength = Length;
+        }
+
         ConstraintType = constraintType;
         // TODO: add logic
     }

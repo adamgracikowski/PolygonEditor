@@ -1,5 +1,6 @@
 ﻿using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace PolygonEditor.GUI.Algorithms;
@@ -102,9 +103,9 @@ public static class Algorithm
         return new Point((int)q.X, (int)q.Y);
     }
 
-    public static void MoveVertexWithConstraints(Vertex vertex, int x, int y)
+    public static bool MoveVertexWithConstraints(Vertex vertex, int x, int y)
     {
-        if (vertex.Parent == null) return;
+        if (vertex.Parent == null) return false;
 
         var polygon = vertex.Parent;
         var copy = polygon.DeepCopy();
@@ -113,6 +114,32 @@ public static class Algorithm
         vertex.Y = y;
 
         if (!RestoreConstraints(vertex))
+        {
+            vertex.Parent = copy;
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void MoveControlVertexWithConstraints(ControlVertex controlVertex, int x, int y)
+    {
+        if (controlVertex.Edge == null || controlVertex.Parent == null) return;
+
+        var edge = controlVertex.Edge;
+        var polygon = controlVertex.Parent;
+        var copy = polygon.DeepCopy();
+
+        controlVertex.X = x;
+        controlVertex.Y = y;
+
+        var vertex = controlVertex == edge.FirstControlVertex
+            ? edge.Start
+            : edge.End;
+
+        if (vertex == null) return;
+
+        if (!MoveVertexWithConstraints(vertex, vertex.X, vertex.Y))
         {
             vertex.Parent = copy;
         }
@@ -137,6 +164,7 @@ public static class Algorithm
             {
                 if (edge == null) continue;
 
+                var changed = false;
                 var other = edge.OtherVertex(current);
 
                 if (!edge.IsBezier)
@@ -144,42 +172,45 @@ public static class Algorithm
                     if (edge.ConstraintType == EdgeConstraintType.Horizontal && !CheckHorizontal(edge))
                     {
                         other.Y = current.Y;
+                        changed = true;
                     }
                     else if (edge.ConstraintType == EdgeConstraintType.Vertical && !CheckVertical(edge))
                     {
                         other.X = current.X;
+                        changed = true;
                     }
                     else if (edge.ConstraintType == EdgeConstraintType.FixedLength && !CheckFixedLength(edge))
                     {
-                        // popraw długość
+                        other.Point = Geometry
+                            .CircleLineIntersection(other.Point, current.Point, edge.FixedLength);
+                        changed = true;
                     }
                 }
                 else
                 {
-                    //if (current.ConstraintType != VertexConstraintType.None &&
-                    //   current.ConstraintType != VertexConstraintType.G0)
-                    //{
-                    //    if (edge == current.FirstEdge)
-                    //    {
-                    //        switch (current.ConstraintType)
-                    //        {
-                    //            case VertexConstraintType.G1:
+                    if (current.ConstraintType != VertexConstraintType.None &&
+                       current.ConstraintType != VertexConstraintType.G0)
+                    {
+                        if (edge == current.FirstEdge)
+                        {
+                            switch (current.ConstraintType)
+                            {
+                                case VertexConstraintType.G1:
+                                    break;
+                                case VertexConstraintType.C1:
+                                    break;
+                                default: break;
+                            }
+                        }
+                        else if (edge == current.SecondEdge)
+                        {
 
-                    //                break;
-                    //            case VertexConstraintType.C1:
-                    //                break;
-                    //            default: break;
-                    //        }
-                    //    }
-                    //    else if (edge == current.SecondEdge)
-                    //    {
+                        }
 
-                    //    }
-
-                    //}
+                    }
                 }
 
-                if (!visited.Contains(other))
+                if (changed && edge.ConstraintType != EdgeConstraintType.None && !visited.Contains(other))
                 {
                     stack.Push(other);
                     visited.Add(other);
@@ -204,6 +235,7 @@ public static class Algorithm
     {
         return Math.Abs(edge.FixedLength - edge.Length) < 0.001f;
     }
+
 
     public static bool CheckAllConstraints(Polygon? polygon)
     {

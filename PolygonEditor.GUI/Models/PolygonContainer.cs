@@ -36,7 +36,6 @@ public sealed class PolygonContainer : IDisposable
         var (dx, dy) = PolygonMovingState.UpdateHitPoint(point);
         Polygon?.MoveWithoutConstraint(dx, dy);
     }
-
     public void MoveSelectedVertex(Point point)
     {
         var (dx, dy) = VertexMovingState.UpdateHitPoint(point);
@@ -59,6 +58,16 @@ public sealed class PolygonContainer : IDisposable
         var (dx, dy) = ControlVertexMovingState.UpdateHitPoint(point);
         var controlVertex = ControlVertexMovingState.SelectedElement;
         controlVertex?.MoveWithoutConstraint(dx, dy);
+    }
+
+    public void MoveSelectedControlVertexWithConstraints(Point point)
+    {
+        ControlVertexMovingState.UpdateHitPoint(point);
+        var controlVertex = ControlVertexMovingState.SelectedElement;
+
+        if (controlVertex == null) return;
+
+        Algorithm.MoveControlVertexWithConstraints(controlVertex, point.X, point.Y);
     }
 
     public void Resize(AlgorithmType algorithmType)
