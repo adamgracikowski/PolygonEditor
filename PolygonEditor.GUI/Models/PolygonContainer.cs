@@ -1,4 +1,5 @@
-﻿using PolygonEditor.GUI.Drawing;
+﻿using PolygonEditor.GUI.Algorithms;
+using PolygonEditor.GUI.Drawing;
 using PolygonEditor.GUI.Models.Enums;
 
 namespace PolygonEditor.GUI.Models;
@@ -41,6 +42,16 @@ public sealed class PolygonContainer : IDisposable
         var (dx, dy) = VertexMovingState.UpdateHitPoint(point);
         var vertex = VertexMovingState.SelectedElement;
         vertex?.MoveWithoutConstraint(dx, dy);
+    }
+
+    public void MoveSelectedVertexWithConstraints(Point point)
+    {
+        VertexMovingState.UpdateHitPoint(point);
+        var vertex = VertexMovingState.SelectedElement;
+
+        if (vertex == null) return;
+
+        Algorithm.MoveVertexWithConstraints(vertex, point.X, point.Y);
     }
 
     public void MoveSelectedControlVertex(Point point)

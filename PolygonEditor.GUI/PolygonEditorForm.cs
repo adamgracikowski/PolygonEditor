@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PolygonEditor.GUI.Algorithms;
 using PolygonEditor.GUI.Drawing;
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
@@ -40,8 +41,10 @@ public partial class PolygonEditorForm : Form
         }
         else if (EditorMode == EditorMode.MovingVertex)
         {
-            PolygonContainer.MoveSelectedVertex(e.Location);
+            //PolygonContainer.MoveSelectedVertex(e.Location);
+            PolygonContainer.MoveSelectedVertexWithConstraints(e.Location);
             PolygonContainer.DrawPolygon(AlgorithmType);
+
         }
         else if (EditorMode == EditorMode.MovingControlVertex)
         {
@@ -153,8 +156,6 @@ public partial class PolygonEditorForm : Form
         return true;
     }
 
-
-
     private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
     {
         CleanUp();
@@ -186,7 +187,6 @@ public partial class PolygonEditorForm : Form
             }
         }
     }
-
     private void LibraryToolStripMenuItem_Click(object sender, EventArgs e)
     {
         if (sender is ToolStripMenuItem && !LibraryToolStripMenuItem.Checked)
