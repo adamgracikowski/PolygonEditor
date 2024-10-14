@@ -9,20 +9,18 @@ public sealed class PolygonContainer : IDisposable
     public Polygon? Polygon { get; set; }
     public List<Vertex> CachedVertices = [];
     public List<Edge> CachedEdges = [];
-    public Bitmap Buffer { get; set; }
-    public PictureBox PictureBox { get; set; }
     public MovingState<Vertex> VertexMovingState { get; } = new();
     public MovingState<ControlVertex> ControlVertexMovingState { get; } = new();
     public MovingState<Polygon> PolygonMovingState { get; } = new();
+    public Bitmap Buffer { get; set; }
+    public PictureBox PictureBox { get; set; }
 
     public PolygonContainer(PictureBox pictureBox)
     {
         PictureBox = pictureBox;
-        //Buffer = new Bitmap(PictureBox.ClientSize.Width, PictureBox.ClientSize.Height);
         Buffer = new Bitmap(PolygonEditorConstants.EditorMaxWidth, PolygonEditorConstants.EditorMaxHeight);
         ClearBuffer();
 
-        //var bitmap = new Bitmap(PictureBox.ClientSize.Width, PictureBox.ClientSize.Height);
         var bitmap = new Bitmap(PolygonEditorConstants.EditorMaxWidth, PolygonEditorConstants.EditorMaxHeight);
         using var graphics = Graphics.FromImage(bitmap);
         graphics.Clear(DrawingStyles.BackgroundColor);
@@ -42,7 +40,6 @@ public sealed class PolygonContainer : IDisposable
         var vertex = VertexMovingState.SelectedElement;
         vertex?.MoveWithoutConstraint(dx, dy);
     }
-
     public void MoveSelectedVertexWithConstraints(Point point)
     {
         VertexMovingState.UpdateHitPoint(point);
@@ -52,14 +49,12 @@ public sealed class PolygonContainer : IDisposable
 
         Algorithm.MoveVertexWithConstraints(vertex, point.X, point.Y);
     }
-
     public void MoveSelectedControlVertex(Point point)
     {
         var (dx, dy) = ControlVertexMovingState.UpdateHitPoint(point);
         var controlVertex = ControlVertexMovingState.SelectedElement;
         controlVertex?.MoveWithoutConstraint(dx, dy);
     }
-
     public void MoveSelectedControlVertexWithConstraints(Point point)
     {
         ControlVertexMovingState.UpdateHitPoint(point);
@@ -147,6 +142,7 @@ public sealed class PolygonContainer : IDisposable
         DrawPartialPolygon(point, algorithmType);
         return false;
     }
+    
     public bool IsVertexHit(Point point, out Vertex? vertex)
     {
         vertex = Polygon?.Vertices.FirstOrDefault(v => v.IsWithinSelection(point.X, point.Y));
@@ -189,6 +185,7 @@ public sealed class PolygonContainer : IDisposable
 
         return Polygon.IsWithinSelection(point.X, point.Y);
     }
+    
     private void SwapBitmaps()
     {
         (Buffer, PictureBox.Image) = (PictureBox.Image as Bitmap, Buffer);

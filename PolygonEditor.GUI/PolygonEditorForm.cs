@@ -1,9 +1,7 @@
-﻿using Newtonsoft.Json;
-using PolygonEditor.GUI.Algorithms;
-using PolygonEditor.GUI.Drawing;
+﻿using PolygonEditor.GUI.Drawing;
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
-using System.Text.Json.Serialization;
+using PolygonEditor.GUI.Properties;
 
 namespace PolygonEditor.GUI;
 public partial class PolygonEditorForm : Form
@@ -16,16 +14,6 @@ public partial class PolygonEditorForm : Form
     {
         InitializeComponent();
         PolygonContainer = new(PictureBox);
-    }
-
-    private void CreatePolygonToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-        if (EditorMode == EditorMode.CreatingPolygon)
-            return;
-
-        if (!ClearWithMessage()) return;
-
-        EditorMode = EditorMode.CreatingPolygon;
     }
 
     private void PictureBox_MouseMove(object sender, MouseEventArgs e)
@@ -41,19 +29,17 @@ public partial class PolygonEditorForm : Form
         }
         else if (EditorMode == EditorMode.MovingVertex)
         {
-            //PolygonContainer.MoveSelectedVertex(e.Location);
             PolygonContainer.MoveSelectedVertexWithConstraints(e.Location);
             PolygonContainer.DrawPolygon(AlgorithmType);
 
         }
         else if (EditorMode == EditorMode.MovingControlVertex)
         {
-            //PolygonContainer.MoveSelectedControlVertex(e.Location);
-            PolygonContainer.MoveSelectedControlVertexWithConstraints(e.Location);
+            PolygonContainer.MoveSelectedControlVertex(e.Location);
+            //PolygonContainer.MoveSelectedControlVertexWithConstraints(e.Location);
             PolygonContainer.DrawPolygon(AlgorithmType);
         }
     }
-
     private void PictureBox_MouseDown(object sender, MouseEventArgs e)
     {
         if (EditorMode == EditorMode.EditingPolygon && e.Button == MouseButtons.Left)
@@ -78,7 +64,6 @@ public partial class PolygonEditorForm : Form
             }
         }
     }
-
     private void PictureBox_MouseUp(object sender, MouseEventArgs e)
     {
         if (sender != PictureBox ||
@@ -106,7 +91,6 @@ public partial class PolygonEditorForm : Form
             EditorMode = EditorMode.EditingPolygon;
         }
     }
-
     private void PictureBox_MouseClick(object sender, MouseEventArgs e)
     {
         if (EditorMode == EditorMode.CreatingPolygon && e.Button == MouseButtons.Left)
@@ -123,15 +107,23 @@ public partial class PolygonEditorForm : Form
             if (PolygonContainer.IsVertexHit(e.Location, out var vertex) && vertex != null)
             {
                 CreateVertexContextMenu(vertex, e.Location);
+                return;
             }
             else if (PolygonContainer.IsEdgeHit(e.Location, out var edge) && edge != null)
             {
                 CreateEdgeContextMenu(edge, e.Location);
+                return;
             }
             else if (PolygonContainer.IsPolygonHit(e.Location, out var polygon) && polygon != null)
             {
                 CreatePolygonContextMenu(polygon, e.Location);
+                return;
             }
+        }
+
+        if (e.Button == MouseButtons.Right)
+        {
+            CreateGeneralContextMenu(e.Location);
         }
     }
 
@@ -139,41 +131,11 @@ public partial class PolygonEditorForm : Form
     {
         ClearWithMessage();
     }
-
-    private bool ClearWithMessage()
-    {
-        var result = MessageBox.Show(
-            "This operation will override your current board.",
-            "Would you like to continue?",
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Warning
-        );
-
-        if (result == DialogResult.No)
-            return false;
-
-        PolygonContainer.ClearContainer();
-
-        return true;
-    }
-
     private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
     {
         CleanUp();
         Application.Exit();
     }
-
-    private void PolygonEditorForm_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        CleanUp();
-    }
-
-    private void CleanUp()
-    {
-        PolygonContainer.Dispose();
-        DrawingStyles.Dispose();
-    }
-
     private void CustomToolStripMenuItem_Click(object sender, EventArgs e)
     {
         if (sender is ToolStripMenuItem && !CustomToolStripMenuItem.Checked)
@@ -281,6 +243,22 @@ public partial class PolygonEditorForm : Form
 
         bezierItem.Click += (s, e) =>
         {
+            var startEdge = edge.Start.FirstEdge;
+            var endEdge = edge.End.SecondEdge;
+
+            if (startEdge == null || endEdge == null ||
+               startEdge.IsBezier || endEdge.IsBezier)
+            {
+                MessageBox.Show(
+                    "Two neighbouring edges can't be Bezier segments.",
+                    "Invalid operation",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+
+                return;
+            }
+
             edge.ToggleBezier();
             PolygonContainer.DrawPolygon(AlgorithmType);
         };
@@ -354,11 +332,54 @@ public partial class PolygonEditorForm : Form
         DynamicContextMenu.Items.Add(deleteItem);
         DynamicContextMenu.Show(PictureBox, point);
     }
+    private void CreateGeneralContextMenu(Point point)
+    {
+        DynamicContextMenu.Items.Clear();
+        var createPolygonItem = new ToolStripMenuItem("Create polygon")
+        {
+            Image = Resources.create
+        };
+        createPolygonItem.Click += (s, e) =>
+        {
+            PolygonContainer.ClearContainer();
+            EditorMode = EditorMode.CreatingPolygon;
+        };
+
+        DynamicContextMenu.Items.Add(createPolygonItem);
+        DynamicContextMenu.Show(PictureBox, point);
+    }
+
     private void PolygonEditorForm_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Escape && EditorMode == EditorMode.CreatingPolygon)
         {
             PolygonContainer.ClearContainer();
         }
+    }
+    private void PolygonEditorForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        CleanUp();
+    }
+
+    private bool ClearWithMessage()
+    {
+        var result = MessageBox.Show(
+            "This operation will override your current board.",
+            "Would you like to continue?",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Warning
+        );
+
+        if (result == DialogResult.No)
+            return false;
+
+        PolygonContainer.ClearContainer();
+
+        return true;
+    }
+    private void CleanUp()
+    {
+        PolygonContainer.Dispose();
+        DrawingStyles.Dispose();
     }
 }

@@ -23,7 +23,6 @@ public sealed class Vertex : VertexBase
 
         }
     }
-
     public override int Y
     {
         get
@@ -40,7 +39,6 @@ public sealed class Vertex : VertexBase
 
     public Edge? FirstEdge { get; set; }
     public Edge? SecondEdge { get; set; }
-    
     public VertexConstraintType ConstraintType { get; set; } = VertexConstraintType.None;
 
     public bool CanApplyConstraint
@@ -65,7 +63,6 @@ public sealed class Vertex : VertexBase
             ConstraintType = this.ConstraintType,
         };
     }
-
     public IEnumerable<Edge?> Edges()
     {
         yield return FirstEdge;

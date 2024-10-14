@@ -2,6 +2,7 @@
 using PolygonEditor.GUI.Models.Enums;
 using System.Diagnostics;
 using System.Numerics;
+using System.Threading.Channels;
 
 namespace PolygonEditor.GUI.Algorithms;
 
@@ -48,61 +49,6 @@ public static class Algorithm
 
         yield break;
     }
-
-    // ciągłości pomiędzy segmentem beziera a odcinkiem:
-
-    // funkcje zwracają położenie końca odcinka po dopasowaniu do segmentu beziera
-    public static Point ContinuityG1P1(Point p1, Point p2, Point p)
-    {
-        var p1V = new Vector2(p1.X, p1.Y);
-        var p2V = new Vector2(p2.X, p2.Y);
-        var pV = new Vector2(p.X, p.Y);
-
-        var direction = p2V - p1V;
-
-        return G1Point(pV, p1V, direction);
-    }
-    public static Point ContinuityG1P4(Point p4, Point p3, Point p)
-    {
-        var p4V = new Vector2(p4.X, p4.Y);
-        var p3V = new Vector2(p3.X, p3.Y);
-        var pV = new Vector2(p.X, p.Y);
-
-        var direction = p4V - p3V;
-
-        return G1Point(pV, p4V, direction);
-    }
-    private static Point G1Point(Vector2 pV, Vector2 commonV, Vector2 direction)
-    {
-        var distance = Vector2.Distance(pV, commonV);
-        var q = commonV + Vector2.Normalize(direction) * distance;
-        return new Point((int)q.X, (int)q.Y);
-    }
-    public static Point ContinuityC1P1(Point p1, Point p2)
-    {
-        var p1V = new Vector2(p1.X, p1.Y);
-        var p2V = new Vector2(p2.X, p2.Y);
-
-        var direction = p2V - p1V;
-
-        return C1Point(p1V, direction);
-    }
-    public static Point ContinuityC1P4(Point p4, Point p3)
-    {
-        var p4V = new Vector2(p4.X, p4.Y);
-        var p3V = new Vector2(p3.X, p3.Y);
-
-        var direction = p4V - p3V;
-
-        return C1Point(p4V, direction);
-    }
-    private static Point C1Point(Vector2 commonV, Vector2 direction)
-    {
-        var length = 3 * direction.Length();
-        Vector2 q = commonV + Vector2.Normalize(direction) * length;
-        return new Point((int)q.X, (int)q.Y);
-    }
-
     public static bool MoveVertexWithConstraints(Vertex vertex, int x, int y)
     {
         if (vertex.Parent == null) return false;
@@ -121,7 +67,6 @@ public static class Algorithm
 
         return true;
     }
-
     public static void MoveControlVertexWithConstraints(ControlVertex controlVertex, int x, int y)
     {
         if (controlVertex.Edge == null || controlVertex.Parent == null) return;
@@ -134,12 +79,12 @@ public static class Algorithm
         controlVertex.Y = y;
 
         var vertex = controlVertex == edge.FirstControlVertex
-            ? edge.Start
-            : edge.End;
+            ? edge.Start.FirstEdge?.Start 
+            : edge.End.SecondEdge?.End;
 
         if (vertex == null) return;
 
-        if (!MoveVertexWithConstraints(vertex, vertex.X, vertex.Y))
+        if (!MoveVertexWithConstraints(vertex, vertex.X, vertex.Y)) // to trzeba zmienić
         {
             vertex.Parent = copy;
         }
@@ -154,7 +99,7 @@ public static class Algorithm
         visited.Add(vertex);
 
         var iterations = 0;
-        var maxIterations = 50;
+        var maxIterations = vertex.Parent?.Vertices.Count * 10;
 
         while (stack.Count > 0 && iterations < maxIterations)
         {
@@ -167,47 +112,10 @@ public static class Algorithm
                 var changed = false;
                 var other = edge.OtherVertex(current);
 
-                if (!edge.IsBezier)
+                if (!edge.IsBezier && !edge.CheckConstraint())
                 {
-                    if (edge.ConstraintType == EdgeConstraintType.Horizontal && !CheckHorizontal(edge))
-                    {
-                        other.Y = current.Y;
-                        changed = true;
-                    }
-                    else if (edge.ConstraintType == EdgeConstraintType.Vertical && !CheckVertical(edge))
-                    {
-                        other.X = current.X;
-                        changed = true;
-                    }
-                    else if (edge.ConstraintType == EdgeConstraintType.FixedLength && !CheckFixedLength(edge))
-                    {
-                        other.Point = Geometry
-                            .CircleLineIntersection(other.Point, current.Point, edge.FixedLength);
-                        changed = true;
-                    }
-                }
-                else
-                {
-                    if (current.ConstraintType != VertexConstraintType.None &&
-                       current.ConstraintType != VertexConstraintType.G0)
-                    {
-                        if (edge == current.FirstEdge)
-                        {
-                            switch (current.ConstraintType)
-                            {
-                                case VertexConstraintType.G1:
-                                    break;
-                                case VertexConstraintType.C1:
-                                    break;
-                                default: break;
-                            }
-                        }
-                        else if (edge == current.SecondEdge)
-                        {
-
-                        }
-
-                    }
+                    changed = true;
+                    edge.PreserveConstraint(current);
                 }
 
                 if (changed && edge.ConstraintType != EdgeConstraintType.None && !visited.Contains(other))
@@ -223,6 +131,16 @@ public static class Algorithm
         return CheckAllConstraints(vertex.Parent);
     }
 
+    public static bool CheckConstraint(this Edge edge)
+    {
+        return edge.ConstraintType switch
+        {
+            EdgeConstraintType.Horizontal => edge.CheckHorizontal(),
+            EdgeConstraintType.Vertical => edge.CheckVertical(),
+            EdgeConstraintType.FixedLength => edge.CheckFixedLength(),
+            _ => true
+        };
+    }
     public static bool CheckHorizontal(this Edge edge)
     {
         return !edge.IsBezier && edge.Start.Y == edge.End.Y;
@@ -233,12 +151,50 @@ public static class Algorithm
     }
     public static bool CheckFixedLength(this Edge edge)
     {
-        return Math.Abs(edge.FixedLength - edge.Length) < 0.001f;
+        return Math.Abs(edge.FixedLength - edge.Length) < PolygonEditorConstants.Epsilon;
     }
+    public static void PreserveConstraint(this Edge edge, Vertex current)
+    {
+        switch (edge.ConstraintType)
+        {
+            case EdgeConstraintType.Horizontal:
+                edge.PreserveHorizontal(current);
+                break;
+            case EdgeConstraintType.Vertical:
+                edge.PreserveVertical(current);
+                break;
+            case EdgeConstraintType.FixedLength:
+                edge.PreserveFixedLength(current);
+                break;
+        };
+    }
+    public static void PreserveHorizontal(this Edge edge, Vertex current)
+    {
+        var other = edge.OtherVertex(current);
 
+        if (other == null) return;
 
+        other.Y = current.Y;
+    }
+    public static void PreserveVertical(this Edge edge, Vertex current)
+    {
+        var other = edge.OtherVertex(current);
+
+        if (other == null) return;
+
+        other.X = current.X;
+    }
+    public static void PreserveFixedLength(this Edge edge, Vertex current)
+    {
+        var other = edge.OtherVertex(current);
+
+        if (other == null) return;
+
+        other.Point = Geometry
+            .CircleLineIntersection(other.Point, current.Point, edge.FixedLength);
+    }
     public static bool CheckAllConstraints(Polygon? polygon)
     {
-        return true; // TODO: dodać jakąś abstrakcję na ograniczenia typu: constraint.Check()
+        return polygon != null && polygon.Edges.All(edge => edge.CheckConstraint());
     }
 }

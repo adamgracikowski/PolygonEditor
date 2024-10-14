@@ -121,19 +121,10 @@
     <value>17, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="CreatePolygonToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EAAACxABrSO9dQAAALhJREFUOE+10jsKAjEUheEIlloINnY+tiGKD8QN2LkRt2Bj4RJEQQsrN2Kpm9H/
-        zOiQiEkmggc+JgzkzE0Y82N6GOfL9FRxxQMTvUjJEGu0oZIuslEuOAVsMcMeNahEk2RZYp4vvenjiDpU
-        MkKRWIHGfn9ZT03iJFQwgL1ZZRs48RX4xt69nkW+FYTOHC2o4IYmDtAx7EQLOtBPcsfnZiVa0IBKfCl1
-        B6H8p2CFaUlnOGlhkcC6WGOen/ctFGea4MMAAAAASUVORK5CYII=
-</value>
-  </data>
   <data name="AlgorithmToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EAAACxABrSO9dQAAAM1JREFUOE+l0zEOAUEYhuEtRZQqjUSnoFGrXEMnodFIdDoh7qAmQSQo3EHhDHsW
+        DwAACw8BkvkDpQAAAM1JREFUOE+l0zEOAUEYhuEtRZQqjUSnoFGrXEMnodFIdDoh7qAmQSQo3EHhDHsW
         7yuziWAF8yVP7P5mZv+d3U3+SAtXrJBa+DYN9DHDyAJxkbdp4ggHnCwQJ/UC//PcTl4ywBJezWwwwRm2
         Xwy/mZfs0YWtOsCJdSzCeQXzB0n7QQm27SBb1BDG43UwRRUHJBfY7hZeIW9jCiijAxcz97HZBItjZJuW
         lxrcF+ftLEQvEH0L0Zv4nJ8f43OiXyQT9Srn5aeP6VNsO3zOSXoDijJCz8SCYeEAAAAASUVORK5CYII=
