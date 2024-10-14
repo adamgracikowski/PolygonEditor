@@ -1,4 +1,6 @@
-﻿namespace PolygonEditor.GUI.Models;
+﻿using Newtonsoft.Json;
+
+namespace PolygonEditor.GUI.Models;
 
 public sealed class ControlVertex : VertexBase
 {
@@ -34,6 +36,7 @@ public sealed class ControlVertex : VertexBase
 
         }
     }
+
     public Edge? Edge { get; set; }
 
     public ControlVertex DeepCopy()

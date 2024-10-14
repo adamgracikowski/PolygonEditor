@@ -1,6 +1,7 @@
 ﻿using PolygonEditor.GUI.Algorithms;
 using PolygonEditor.GUI.Models.Enums;
 using PolygonEditor.GUI.Models.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace PolygonEditor.GUI.Models;
 
@@ -30,9 +31,12 @@ public sealed class Edge : ISelectable
 
     public Vertex Start { get; set; }
     public Vertex End { get; set; }
+
     public Polygon? Parent { get; set; }
+    
     public ControlVertex? FirstControlVertex { get; set; }
     public ControlVertex? SecondControlVertex { get; set; }
+    public float FixedLength { get; set; }
     public bool IsBezier { get; set; }
     public EdgeConstraintType ConstraintType { get; set; } = EdgeConstraintType.None;
 
@@ -58,11 +62,11 @@ public sealed class Edge : ISelectable
                 End.SecondEdge.ConstraintType != EdgeConstraintType.Vertical;
         }
     }
-    public double Length
+    public float Length
     {
         get
         {
-            return Math.Sqrt(
+            return (float)Math.Sqrt(
                 (Start.X - End.X) * (Start.X - End.X) +
                 (Start.Y - End.Y) * (Start.Y - End.Y)
             );
@@ -145,7 +149,14 @@ public sealed class Edge : ISelectable
             start: Start.DeepCopy(),
             end: End.DeepCopy(),
             firstControlVertex: FirstControlVertex?.DeepCopy(),
-            secondControlVertex: SecondControlVertex?.DeepCopy()
-        );
+            secondControlVertex: SecondControlVertex?.DeepCopy())
+        {
+            ConstraintType = this.ConstraintType
+        };
+    }
+
+    public Vertex OtherVertex(Vertex vertex)
+    {
+        return vertex == Start ? End : Start;
     }
 }

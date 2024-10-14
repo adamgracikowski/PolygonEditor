@@ -1,10 +1,11 @@
 ﻿using PolygonEditor.GUI.Models.Enums;
+using System.Text.Json.Serialization;
 
 namespace PolygonEditor.GUI.Models;
 
 public sealed class Vertex : VertexBase
 {
-    public Vertex(Point point, Polygon? parent = null)
+    public Vertex(Point point = default, Polygon? parent = null)
         : base(point, parent)
     {
     }
@@ -39,6 +40,7 @@ public sealed class Vertex : VertexBase
 
     public Edge? FirstEdge { get; set; }
     public Edge? SecondEdge { get; set; }
+    
     public VertexConstraintType ConstraintType { get; set; } = VertexConstraintType.None;
 
     public bool CanApplyConstraint
@@ -58,6 +60,15 @@ public sealed class Vertex : VertexBase
 
     public Vertex DeepCopy()
     {
-        return new Vertex(Point);
+        return new Vertex(Point)
+        {
+            ConstraintType = this.ConstraintType,
+        };
+    }
+
+    public IEnumerable<Edge?> Edges()
+    {
+        yield return FirstEdge;
+        yield return SecondEdge;
     }
 }

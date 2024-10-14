@@ -1,6 +1,8 @@
-﻿using PolygonEditor.GUI.Drawing;
+﻿using Newtonsoft.Json;
+using PolygonEditor.GUI.Drawing;
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
+using System.Text.Json.Serialization;
 
 namespace PolygonEditor.GUI;
 public partial class PolygonEditorForm : Form
@@ -256,17 +258,20 @@ public partial class PolygonEditorForm : Form
     {
         DynamicContextMenu.Items.Clear();
 
-        var addVertexItem = new ToolStripMenuItem("Add vertex");
-        addVertexItem.Click += (s, e) =>
+        if (!edge.IsBezier)
         {
-            if (PolygonContainer.Polygon == null)
-                return;
+            var addVertexItem = new ToolStripMenuItem("Add vertex");
+            addVertexItem.Click += (s, e) =>
+            {
+                if (PolygonContainer.Polygon == null)
+                    return;
 
-            PolygonContainer.Polygon.AddVertex(edge);
-            PolygonContainer.DrawPolygon(AlgorithmType);
-        };
+                PolygonContainer.Polygon.AddVertex(edge);
+                PolygonContainer.DrawPolygon(AlgorithmType);
+            };
 
-        DynamicContextMenu.Items.Add(addVertexItem);
+            DynamicContextMenu.Items.Add(addVertexItem);
+        }
 
         var bezierItem = new ToolStripMenuItem("Bezier")
         {

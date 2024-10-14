@@ -31,8 +31,6 @@ partial class PolygonEditorForm
         var resources = new System.ComponentModel.ComponentResourceManager(typeof(PolygonEditorForm));
         UpperMenuStrip = new MenuStrip();
         FileToolStripMenuItem = new ToolStripMenuItem();
-        LoadToolStripMenuItem = new ToolStripMenuItem();
-        SaveToolStripMenuItem = new ToolStripMenuItem();
         ClearToolStripMenuItem = new ToolStripMenuItem();
         ExitToolStripMenuItem = new ToolStripMenuItem();
         CreatePolygonToolStripMenuItem = new ToolStripMenuItem();
@@ -59,24 +57,10 @@ partial class PolygonEditorForm
         // 
         // FileToolStripMenuItem
         // 
-        FileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { LoadToolStripMenuItem, SaveToolStripMenuItem, ClearToolStripMenuItem, ExitToolStripMenuItem, CreatePolygonToolStripMenuItem, AlgorithmToolStripMenuItem });
+        FileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { CreatePolygonToolStripMenuItem, AlgorithmToolStripMenuItem, ClearToolStripMenuItem, ExitToolStripMenuItem });
         FileToolStripMenuItem.Name = "FileToolStripMenuItem";
         FileToolStripMenuItem.Size = new Size(46, 24);
         FileToolStripMenuItem.Text = "&File";
-        // 
-        // LoadToolStripMenuItem
-        // 
-        LoadToolStripMenuItem.Image = (Image)resources.GetObject("LoadToolStripMenuItem.Image");
-        LoadToolStripMenuItem.Name = "LoadToolStripMenuItem";
-        LoadToolStripMenuItem.Size = new Size(224, 26);
-        LoadToolStripMenuItem.Text = "&Load";
-        // 
-        // SaveToolStripMenuItem
-        // 
-        SaveToolStripMenuItem.Image = (Image)resources.GetObject("SaveToolStripMenuItem.Image");
-        SaveToolStripMenuItem.Name = "SaveToolStripMenuItem";
-        SaveToolStripMenuItem.Size = new Size(224, 26);
-        SaveToolStripMenuItem.Text = "&Save";
         // 
         // ClearToolStripMenuItem
         // 
@@ -183,8 +167,6 @@ partial class PolygonEditorForm
 
     private MenuStrip UpperMenuStrip;
     private ToolStripMenuItem FileToolStripMenuItem;
-    private ToolStripMenuItem LoadToolStripMenuItem;
-    private ToolStripMenuItem SaveToolStripMenuItem;
     private ToolStripMenuItem ClearToolStripMenuItem;
     private ToolStripMenuItem ExitToolStripMenuItem;
     private ToolStripMenuItem HelpToolStripMenuItem;

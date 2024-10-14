@@ -1,11 +1,12 @@
 ﻿using PolygonEditor.GUI.Algorithms;
 using PolygonEditor.GUI.Models.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace PolygonEditor.GUI.Models;
 
 public abstract class VertexBase : ISelectable
 {
-    protected VertexBase(Point point, Polygon? parent = null)
+    protected VertexBase(Point point = default, Polygon? parent = null)
     {
         Point = point;
         Parent = parent;
@@ -34,6 +35,7 @@ public abstract class VertexBase : ISelectable
         }
     }
     public Point Point { get; set; }
+
     public Polygon? Parent { get; set; }
 
     public bool IsWithinSelection(int x, int y)
