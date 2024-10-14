@@ -56,4 +56,8 @@ public sealed class Vertex : VertexBase
         // TODO: add logic
     }
 
+    public Vertex DeepCopy()
+    {
+        return new Vertex(Point);
+    }
 }

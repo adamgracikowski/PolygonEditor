@@ -35,4 +35,9 @@ public sealed class ControlVertex : VertexBase
         }
     }
     public Edge? Edge { get; set; }
+
+    public ControlVertex DeepCopy()
+    {
+        return new ControlVertex(Point);
+    }
 }

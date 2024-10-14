@@ -138,4 +138,14 @@ public sealed class Edge : ISelectable
             Edge = this
         };
     }
+    
+    public Edge DeepCopy()
+    {
+        return new Edge(
+            start: Start.DeepCopy(),
+            end: End.DeepCopy(),
+            firstControlVertex: FirstControlVertex?.DeepCopy(),
+            secondControlVertex: SecondControlVertex?.DeepCopy()
+        );
+    }
 }
