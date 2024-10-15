@@ -6,7 +6,7 @@ namespace PolygonEditor.GUI.Models;
 
 public sealed class PolygonContainer : IDisposable
 {
-    public Polygon? Polygon { get; set; }
+    public Polygon? Polygon;
     public List<Vertex> CachedVertices = [];
     public List<Edge> CachedEdges = [];
     public MovingState<Vertex> VertexMovingState { get; } = new();
@@ -40,14 +40,20 @@ public sealed class PolygonContainer : IDisposable
         var vertex = VertexMovingState.SelectedElement;
         vertex?.MoveWithoutConstraint(dx, dy);
     }
-    public void MoveSelectedVertexWithConstraints(Point point)
+    public bool MoveSelectedVertexWithConstraints(Point point)
     {
-        VertexMovingState.UpdateHitPoint(point);
+        var offset = VertexMovingState.UpdateHitPoint(point);
         var vertex = VertexMovingState.SelectedElement;
 
-        if (vertex == null) return;
+        if (vertex == null) return false;
 
-        Algorithm.MoveVertexWithConstraints(vertex, point.X, point.Y);
+        if(Polygon != null && Polygon.Edges.All(edge => edge.ConstraintType == EdgeConstraintType.FixedLength))
+        {
+            Polygon.MoveWithoutConstraint(offset.x, offset.y);
+            return true;
+        }
+
+        return Algorithm.MoveVertexWithConstraints(vertex, point.X, point.Y, ref Polygon);
     }
     public void MoveSelectedControlVertex(Point point)
     {
@@ -62,7 +68,7 @@ public sealed class PolygonContainer : IDisposable
 
         if (controlVertex == null) return;
 
-        Algorithm.MoveControlVertexWithConstraints(controlVertex, point.X, point.Y);
+        Algorithm.MoveControlVertexWithConstraints(controlVertex, point.X, point.Y, ref Polygon);
     }
 
     public void Resize(AlgorithmType algorithmType)

@@ -93,24 +93,4 @@ public sealed class Polygon : ISelectable
         graphicsPath.AddPolygon(Vertices.Select(v => v.Point).ToArray());
         return graphicsPath.IsVisible(x, y);
     }
-
-    public Polygon DeepCopy()
-    {
-        var edges = Edges.Select(edge => edge.DeepCopy()).ToList();
-        var vertices = edges.Select(edge => edge.Start).ToList();
-        var copy = new Polygon(vertices, edges);
-
-        edges.ForEach(edge =>
-        {
-            if (edge.IsBezier && 
-                edge.FirstControlVertex != null && 
-                edge.SecondControlVertex != null)
-            {
-                edge.FirstControlVertex.Parent = copy;
-                edge.SecondControlVertex.Parent = copy;
-            }
-        });
-
-        return copy;
-    }
 }

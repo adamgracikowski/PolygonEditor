@@ -29,14 +29,24 @@ public partial class PolygonEditorForm : Form
         }
         else if (EditorMode == EditorMode.MovingVertex)
         {
-            PolygonContainer.MoveSelectedVertexWithConstraints(e.Location);
-            PolygonContainer.DrawPolygon(AlgorithmType);
+            if (!PolygonContainer.MoveSelectedVertexWithConstraints(e.Location))
+            {
+                //PolygonContainer.PolygonMovingState.Clear();
+                //EditorMode = EditorMode.EditingPolygon;
 
+                //MessageBox.Show(
+                //    "Imposed constraints don't allow for the specified move",
+                //    "Invalid operation",
+                //    MessageBoxButtons.OK,
+                //    MessageBoxIcon.Information
+                //);
+            }
+            PolygonContainer.DrawPolygon(AlgorithmType);
         }
         else if (EditorMode == EditorMode.MovingControlVertex)
         {
-            PolygonContainer.MoveSelectedControlVertex(e.Location);
-            //PolygonContainer.MoveSelectedControlVertexWithConstraints(e.Location);
+            //PolygonContainer.MoveSelectedControlVertex(e.Location);
+            PolygonContainer.MoveSelectedControlVertexWithConstraints(e.Location);
             PolygonContainer.DrawPolygon(AlgorithmType);
         }
     }

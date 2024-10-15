@@ -55,14 +55,6 @@ public sealed class Vertex : VertexBase
         ConstraintType = constraintType;
         // TODO: add logic
     }
-
-    public Vertex DeepCopy()
-    {
-        return new Vertex(Point)
-        {
-            ConstraintType = this.ConstraintType,
-        };
-    }
     public IEnumerable<Edge?> Edges()
     {
         yield return FirstEdge;

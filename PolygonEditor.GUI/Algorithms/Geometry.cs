@@ -15,7 +15,20 @@ public static class Geometry
         var q = sV + Vector2.Normalize(direction) * r;
         return new Point((int)q.X, (int)q.Y);
     }
-    
+
+    public static Point ProjectPointOnLine(Point p, Point s, Point r)
+    {
+        var pV = new Vector2(p.X, p.Y);
+        var sV = new Vector2(s.X, s.Y);
+        var rV = new Vector2(r.X, r.Y);
+
+        var lineDirectionNormalized = Vector2.Normalize(rV - sV);
+        var dot = Vector2.Dot(pV - sV, lineDirectionNormalized);
+        var t = sV + lineDirectionNormalized * dot;
+
+        return new Point((int)t.X, (int)t.Y);
+    }
+
     public static bool CheckG1(Point s, Point r, Point p)
     {
         var sV = new Vector2(s.X, s.Y);
@@ -51,12 +64,12 @@ public static class Geometry
         var t = sV + Vector2.Normalize(direction) * length;
         return new Point((int)t.X, (int)t.Y);
     }
-    public static Point PreserveC1(Point s, Point p)
+    public static Point PreserveC1(Point s, Point p, float k = 3.0f)
     {
         var sV = new Vector2(s.X, s.Y);
         var pV = new Vector2(p.X, p.Y);
 
-        var t = sV + (sV - pV) / 3;
+        var t = sV + (sV - pV) / k;
         return new Point((int)t.X, (int)t.Y);
     }
 

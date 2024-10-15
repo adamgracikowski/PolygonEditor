@@ -1,5 +1,7 @@
 ﻿using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms.VisualStyles;
 
 namespace PolygonEditor.GUI.Algorithms;
 
@@ -46,19 +48,16 @@ public static class Algorithm
 
         yield break;
     }
-    public static bool MoveVertexWithConstraints(Vertex vertex, int x, int y)
+    public static bool MoveVertexWithConstraints(Vertex vertex, int x, int y, ref Polygon? polygon)
     {
         if (vertex.Parent == null) return false;
-
-        var polygon = vertex.Parent;
-        var copy = polygon.DeepCopy();
 
         vertex.X = x;
         vertex.Y = y;
 
         if (!RestoreConstraints(vertex))
         {
-            vertex.Parent = copy;
+            // powrót do poprzedniego stanu
             return false;
         }
 
@@ -111,17 +110,17 @@ public static class Algorithm
     }
     public static bool RestoreConstraints(Vertex vertex)
     {
-        if(!RestoreLoop(vertex, v => v.FirstEdge))
+        if (!RestoreLoop(vertex, v => v.FirstEdge))
         {
             return false;
         }
 
-        if(!RestoreLoop(vertex, v => v.SecondEdge))
+        if (!RestoreLoop(vertex, v => v.SecondEdge))
         {
             return false;
         }
 
-        return CheckAllConstraints(vertex.Parent);
+        return true; // temporary solution
     }
 
     [Obsolete("Works for polygons with no bezier edges only.")]
@@ -309,15 +308,13 @@ public static class Algorithm
 
         return (vertex, controlVertex, otherVertex);
     }
-    
+
     public static bool CheckAllConstraints(Polygon? polygon)
     {
         return polygon != null &&
             polygon.Edges.All(edge => edge.CheckConstraint()) &&
             polygon.Vertices.All(vertex => vertex.CheckConstraint());
     }
-
-
 
     private static bool IsBezierNeighbour(this Edge edge, Vertex other)
     {
@@ -330,8 +327,113 @@ public static class Algorithm
         return otherEdge.IsBezier;
     }
 
-    public static void MoveControlVertexWithConstraints(ControlVertex controlVertex, int x, int y)
+    public static bool MoveControlVertexWithConstraints(ControlVertex controlVertex, int x, int y, ref Polygon? polygon)
     {
+        if (controlVertex.Parent == null) return false;
 
+        var (vertex, _, otherVertex, edge) = controlVertex.GetControlVertexConfiguration();
+
+        if (vertex == null || otherVertex == null || edge == null) return false;
+
+        if (vertex.ConstraintType == VertexConstraintType.G0 ||
+            vertex.ConstraintType == VertexConstraintType.None)
+        {
+            controlVertex.X = x;
+            controlVertex.Y = y;
+            return true;
+        }
+        else if (vertex.ConstraintType == VertexConstraintType.G1)
+        {
+            if (edge.ConstraintType == EdgeConstraintType.Vertical ||
+               edge.ConstraintType == EdgeConstraintType.Horizontal)
+            {
+                controlVertex.Point = Geometry.ProjectPointOnLine(new Point(x, y), otherVertex.Point, vertex.Point);
+                return true;
+            }
+            else
+            {
+                controlVertex.X = x;
+                controlVertex.Y = y;
+                otherVertex.Point = Geometry.PreserveG1(vertex.Point, otherVertex.Point, controlVertex.Point);
+
+                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+                {
+                    // powrót do poprzedniego stanu
+                    return false;
+                }
+
+                return true;
+            }
+        }
+        else if (vertex.ConstraintType == VertexConstraintType.C1)
+        {
+            if (edge.ConstraintType == EdgeConstraintType.Vertical ||
+                edge.ConstraintType == EdgeConstraintType.Horizontal)
+            {
+                controlVertex.Point = Geometry.ProjectPointOnLine(new Point(x, y), otherVertex.Point, vertex.Point);
+                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
+
+                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+                {
+                    // powrót do poprzedniego stanu
+                    return false;
+                }
+
+                return true;
+            }
+            else if (edge.ConstraintType == EdgeConstraintType.None)
+            {
+                controlVertex.X = x;
+                controlVertex.Y = y;
+                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
+
+                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+                {
+                    // powrót do poprzedniego stanu
+                    return false;
+                }
+
+                return true;
+            }
+            else if (edge.ConstraintType == EdgeConstraintType.FixedLength)
+            {
+                controlVertex.Point = Geometry.CircleLineIntersection(new Point(x, y), vertex.Point, edge.FixedLength / 3.0f);
+                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
+
+                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+                {
+                    // powrót do poprzedniego stanu
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        return true;
+    }
+
+    private static (Vertex? vertex, ControlVertex? controlVertex, Vertex? otherVertex, Edge? edge) GetControlVertexConfiguration(this ControlVertex controlVertex)
+    {
+        Vertex? vertex = null;
+        Vertex? otherVertex = null;
+        Edge? edge = null;
+
+        var bezier = controlVertex.Edge;
+
+        if (bezier == null)
+            return (vertex, controlVertex, otherVertex, edge);
+
+        vertex = controlVertex == bezier.FirstControlVertex
+            ? bezier.Start
+            : bezier.End;
+
+        edge = vertex.FirstEdge == bezier
+            ? vertex.SecondEdge
+            : vertex.FirstEdge;
+
+        otherVertex = edge?.OtherVertex(vertex);
+
+        return (vertex, controlVertex, otherVertex, edge);
     }
 }
