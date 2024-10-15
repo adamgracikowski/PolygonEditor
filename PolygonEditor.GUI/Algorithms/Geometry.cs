@@ -15,7 +15,6 @@ public static class Geometry
         var q = sV + Vector2.Normalize(direction) * r;
         return new Point((int)q.X, (int)q.Y);
     }
-
     public static Point ProjectPointOnLine(Point p, Point s, Point r)
     {
         var pV = new Vector2(p.X, p.Y);
@@ -71,30 +70,5 @@ public static class Geometry
 
         var t = sV + (sV - pV) / k;
         return new Point((int)t.X, (int)t.Y);
-    }
-
-
-    // jeszcze nie działa dobrze
-    public static Point PreserveG1FromControlVertex(Point s, Point r, Point p)
-    {
-        var sV = new Vector2(s.X, s.Y);
-        var rV = new Vector2(r.X, r.Y);
-        var pV = new Vector2(p.X, p.Y);
-
-        var direction = sV - rV;
-        var length = (pV - sV).Length();
-
-        var t = sV + Vector2.Normalize(direction) * length;
-        return new Point((int)t.X, (int)t.Y);
-    }
-    public static Point PreserveC1FromControlVertex(Point s, Point r, Point p)
-    {
-        var sV = new Vector2(s.X, s.Y);
-        var rV = new Vector2(r.X, r.Y);
-
-        var t = 3 * (sV - rV);
-        return new Point((int)t.X, (int)t.Y);
-    }
-    
-    
+    }    
 }

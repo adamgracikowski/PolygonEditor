@@ -1,4 +1,5 @@
 ﻿namespace PolygonEditor.GUI.Models;
+
 public sealed class MovingState<T>
     where T : class
 {
@@ -11,7 +12,6 @@ public sealed class MovingState<T>
     public T? SelectedElement { get; set; }
     public Point HitPoint { get; set; }
 
-    public bool IsMoving => SelectedElement != null;
     public void Clear()
     {
         SelectedElement = null;

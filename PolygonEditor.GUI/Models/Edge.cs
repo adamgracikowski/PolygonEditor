@@ -1,12 +1,20 @@
 ﻿using PolygonEditor.GUI.Algorithms;
 using PolygonEditor.GUI.Models.Enums;
 using PolygonEditor.GUI.Models.Interfaces;
-using System.Text.Json.Serialization;
 
 namespace PolygonEditor.GUI.Models;
 
 public sealed class Edge : ISelectable
 {
+    public Vertex Start { get; set; }
+    public Vertex End { get; set; }
+    public Polygon? Parent { get; set; }
+    public ControlVertex? FirstControlVertex { get; set; }
+    public ControlVertex? SecondControlVertex { get; set; }
+    public bool IsBezier { get; set; }
+    public float FixedLength { get; set; }
+    public EdgeConstraintType ConstraintType { get; set; } = EdgeConstraintType.None;
+
     public Edge(Vertex start, Vertex end, Polygon? parent = null,
         ControlVertex? firstControlVertex = null, ControlVertex? secondControlVertex = null)
     {
@@ -29,17 +37,16 @@ public sealed class Edge : ISelectable
             SecondControlVertex.Edge = this;
     }
 
-    public Vertex Start { get; set; }
-    public Vertex End { get; set; }
-
-    public Polygon? Parent { get; set; }
-    
-    public ControlVertex? FirstControlVertex { get; set; }
-    public ControlVertex? SecondControlVertex { get; set; }
-    public float FixedLength { get; set; }
-    public bool IsBezier { get; set; }
-    public EdgeConstraintType ConstraintType { get; set; } = EdgeConstraintType.None;
-
+    public float Length
+    {
+        get
+        {
+            return (float)Math.Sqrt(
+                (Start.X - End.X) * (Start.X - End.X) +
+                (Start.Y - End.Y) * (Start.Y - End.Y)
+            );
+        }
+    }
     public bool CanApplyHorizontalConstraint
     {
         get
@@ -62,17 +69,11 @@ public sealed class Edge : ISelectable
                 End.SecondEdge.ConstraintType != EdgeConstraintType.Vertical;
         }
     }
-    public float Length
-    {
-        get
-        {
-            return (float)Math.Sqrt(
-                (Start.X - End.X) * (Start.X - End.X) +
-                (Start.Y - End.Y) * (Start.Y - End.Y)
-            );
-        }
-    }
 
+    public Vertex OtherVertex(Vertex vertex)
+    {
+        return vertex == Start ? End : Start;
+    }
     public bool IsWithinSelection(int x, int y)
     {
         if (IsBezier && FirstControlVertex != null && SecondControlVertex != null)
@@ -85,7 +86,6 @@ public sealed class Edge : ISelectable
                 .Any(p => Geometry.IsNear(p.X, p.Y, x, y, PolygonEditorConstants.HitRadius));
         }
     }
-
     public void ToggleBezier()
     {
         if (IsBezier)
@@ -101,7 +101,6 @@ public sealed class Edge : ISelectable
 
         IsBezier = !IsBezier;
     }
-
     public void ApplyEdgeConstraint(EdgeConstraintType constraintType)
     {
         if (ConstraintType == constraintType)
@@ -113,9 +112,7 @@ public sealed class Edge : ISelectable
         }
 
         ConstraintType = constraintType;
-        // TODO: add logic
     }
-
     private void SetDefaultControlPoints(float k = 0.5f)
     {
         float mx = (Start.X + End.X) / 2;
@@ -146,10 +143,5 @@ public sealed class Edge : ISelectable
             Parent = this.Parent,
             Edge = this
         };
-    }
-    
-    public Vertex OtherVertex(Vertex vertex)
-    {
-        return vertex == Start ? End : Start;
     }
 }

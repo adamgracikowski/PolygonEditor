@@ -5,6 +5,9 @@ namespace PolygonEditor.GUI.Models;
 
 public sealed class Polygon : ISelectable
 {
+    public List<Vertex> Vertices { get; set; } = [];
+    public List<Edge> Edges { get; set; } = [];
+
     public Polygon(List<Vertex> vertices, List<Edge> edges)
     {
         Vertices = vertices;
@@ -13,9 +16,6 @@ public sealed class Polygon : ISelectable
         Vertices.ForEach(v => v.Parent = this);
         Edges.ForEach(e => e.Parent = this);
     }
-
-    public List<Vertex> Vertices { get; set; } = [];
-    public List<Edge> Edges { get; set; } = [];
 
     public bool DeleteVertex(Vertex vertex)
     {

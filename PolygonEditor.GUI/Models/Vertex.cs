@@ -1,45 +1,17 @@
 ﻿using PolygonEditor.GUI.Models.Enums;
-using System.Text.Json.Serialization;
 
 namespace PolygonEditor.GUI.Models;
 
 public sealed class Vertex : VertexBase
 {
+    public Edge? FirstEdge { get; set; }
+    public Edge? SecondEdge { get; set; }
+    public VertexConstraintType ConstraintType { get; set; } = VertexConstraintType.None;
+
     public Vertex(Point point = default, Polygon? parent = null)
         : base(point, parent)
     {
     }
-
-    public override int X
-    {
-        get
-        {
-            return Point.X;
-        }
-
-        set
-        {
-            Point = new Point(value, Point.Y);
-
-        }
-    }
-    public override int Y
-    {
-        get
-        {
-            return Point.Y;
-        }
-
-        set
-        {
-            Point = new Point(Point.X, value);
-
-        }
-    }
-
-    public Edge? FirstEdge { get; set; }
-    public Edge? SecondEdge { get; set; }
-    public VertexConstraintType ConstraintType { get; set; } = VertexConstraintType.None;
 
     public bool CanApplyConstraint
     {
@@ -53,7 +25,6 @@ public sealed class Vertex : VertexBase
     public void ApplyVertexConstraint(VertexConstraintType constraintType)
     {
         ConstraintType = constraintType;
-        // TODO: add logic
     }
     public IEnumerable<Edge?> Edges()
     {

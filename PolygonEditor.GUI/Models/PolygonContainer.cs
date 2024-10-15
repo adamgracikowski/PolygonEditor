@@ -71,48 +71,86 @@ public sealed class PolygonContainer : IDisposable
         Algorithm.MoveControlVertexWithConstraints(controlVertex, point.X, point.Y, ref Polygon);
     }
 
-    public void Resize(AlgorithmType algorithmType)
+    public bool IsVertexHit(Point point, out Vertex? vertex)
     {
-        var oldBuffer = Buffer;
-        var oldBitmap = PictureBox.Image;
-
-        Buffer = new Bitmap(PictureBox.ClientSize.Width, PictureBox.ClientSize.Height);
-
-        using var graphicsBuffer = Graphics.FromImage(Buffer);
-        graphicsBuffer.Clear(DrawingStyles.BackgroundColor);
-
-        if (Polygon != null)
-        {
-            DrawPolygonUsingGraphics(graphicsBuffer, algorithmType);
-        }
-        else if (CachedVertices.Count > 0)
-        {
-            DrawPartialPolygonUsingGraphics(graphicsBuffer, CachedVertices[^1].Point, algorithmType);
-        }
-
-        SwapBitmaps();
-        PictureBox.Refresh();
-
-        Buffer = new Bitmap(PictureBox.ClientSize.Width, PictureBox.ClientSize.Height);
-        ClearBuffer();
-
-        oldBuffer?.Dispose();
-        oldBitmap?.Dispose();
+        vertex = Polygon?.Vertices.FirstOrDefault(v => v.IsWithinSelection(point.X, point.Y));
+        return vertex != null;
     }
-    public void Dispose()
+    public bool IsControlVertexHit(Point point, out ControlVertex? controlVertex)
     {
-        Buffer.Dispose();
-        PictureBox.Image?.Dispose();
-    }
-    public void ClearContainer()
-    {
-        Polygon = null;
-        CachedEdges = [];
-        CachedVertices = [];
+        controlVertex = null;
 
+        if (Polygon == null)
+            return false;
+
+        foreach (var edge in Polygon.Edges)
+        {
+            if (edge.FirstControlVertex != null && edge.FirstControlVertex.IsWithinSelection(point.X, point.Y))
+            {
+                controlVertex = edge.FirstControlVertex;
+                return true;
+            }
+            if (edge.SecondControlVertex != null && edge.SecondControlVertex.IsWithinSelection(point.X, point.Y))
+            {
+                controlVertex = edge.SecondControlVertex;
+                return true;
+            }
+        }
+
+        return false;
+    }
+    public bool IsEdgeHit(Point point, out Edge? edge)
+    {
+        edge = Polygon?.Edges.FirstOrDefault(e => e.IsWithinSelection(point.X, point.Y));
+        return edge != null;
+    }
+    public bool IsPolygonHit(Point point, out Polygon? polygon)
+    {
+        polygon = Polygon;
+
+        if (Polygon == null)
+            return false;
+
+        return Polygon.IsWithinSelection(point.X, point.Y);
+    }
+
+    public void DrawPolygon(AlgorithmType algorithmType)
+    {
+        using var graphics = Graphics.FromImage(Buffer);
+        DrawPolygonUsingGraphics(graphics, algorithmType);
         SwapBitmaps();
         ClearBuffer();
         PictureBox.Refresh();
+    }
+    public void DrawPartialPolygon(Point point, AlgorithmType algorithmType)
+    {
+        using var graphics = Graphics.FromImage(Buffer);
+        DrawPartialPolygonUsingGraphics(graphics, point, algorithmType);
+        SwapBitmaps();
+        ClearBuffer();
+        PictureBox.Refresh();
+    }
+    private void DrawPartialPolygonUsingGraphics(Graphics graphics, Point point, AlgorithmType algorithmType)
+    {
+        graphics.DrawEdge(algorithmType, [.. CachedEdges]);
+        graphics.DrawEdge(algorithmType, CachedVertices[^1], point);
+        graphics.DrawVertex([.. CachedVertices]);
+    }
+    private void DrawPolygonUsingGraphics(Graphics graphics, AlgorithmType algorithmType)
+    {
+        if (Polygon == null)
+            return;
+
+        graphics.DrawEdge(algorithmType, [.. Polygon.Edges]);
+        graphics.FillPolygon(
+            DrawingStyles.PolygonFillBrush,
+            Polygon.Vertices
+                .Select(v => new PointF(v.X, v.Y))
+                .ToArray()
+        );
+        graphics.DrawVertex([.. Polygon.Vertices]);
+        graphics.DrawEdgeConstraints([.. Polygon.Edges]);
+        graphics.DrawVertexConstraint([.. Polygon.Vertices]);
     }
 
     public bool AddVertexToPartialPolygon(Point point, AlgorithmType algorithmType)
@@ -148,95 +186,57 @@ public sealed class PolygonContainer : IDisposable
         DrawPartialPolygon(point, algorithmType);
         return false;
     }
-    
-    public bool IsVertexHit(Point point, out Vertex? vertex)
-    {
-        vertex = Polygon?.Vertices.FirstOrDefault(v => v.IsWithinSelection(point.X, point.Y));
-        return vertex != null;
-    }
-    public bool IsControlVertexHit(Point point, out ControlVertex? controlVertex)
-    {
-        controlVertex = null;
 
-        if (Polygon == null)
-            return false;
+    public void Resize(AlgorithmType algorithmType)
+    {
+        var oldBuffer = Buffer;
+        var oldBitmap = PictureBox.Image;
 
-        foreach(var edge in Polygon.Edges)
+        Buffer = new Bitmap(PictureBox.ClientSize.Width, PictureBox.ClientSize.Height);
+
+        using var graphicsBuffer = Graphics.FromImage(Buffer);
+        graphicsBuffer.Clear(DrawingStyles.BackgroundColor);
+
+        if (Polygon != null)
         {
-            if(edge.FirstControlVertex != null && edge.FirstControlVertex.IsWithinSelection(point.X, point.Y))
-            {
-                controlVertex = edge.FirstControlVertex;
-                return true;
-            }
-            if (edge.SecondControlVertex != null && edge.SecondControlVertex.IsWithinSelection(point.X, point.Y))
-            {
-                controlVertex = edge.SecondControlVertex;
-                return true;
-            }
+            DrawPolygonUsingGraphics(graphicsBuffer, algorithmType);
+        }
+        else if (CachedVertices.Count > 0)
+        {
+            DrawPartialPolygonUsingGraphics(graphicsBuffer, CachedVertices[^1].Point, algorithmType);
         }
 
-        return false;
-    }
-    public bool IsEdgeHit(Point point, out Edge? edge)
-    {
-        edge = Polygon?.Edges.FirstOrDefault(e => e.IsWithinSelection(point.X, point.Y));
-        return edge != null;
-    }
-    public bool IsPolygonHit(Point point, out Polygon? polygon)
-    {
-        polygon = Polygon;
+        SwapBitmaps();
+        PictureBox.Refresh();
 
-        if (Polygon == null)
-            return false;
+        Buffer = new Bitmap(PictureBox.ClientSize.Width, PictureBox.ClientSize.Height);
+        ClearBuffer();
 
-        return Polygon.IsWithinSelection(point.X, point.Y);
+        oldBuffer?.Dispose();
+        oldBitmap?.Dispose();
     }
-    
+    public void ClearContainer()
+    {
+        Polygon = null;
+        CachedEdges = [];
+        CachedVertices = [];
+
+        SwapBitmaps();
+        ClearBuffer();
+        PictureBox.Refresh();
+    }
     private void SwapBitmaps()
     {
-        (Buffer, PictureBox.Image) = (PictureBox.Image as Bitmap, Buffer);
-    }
-    public void DrawPolygon(AlgorithmType algorithmType)
-    {
-        using var graphics = Graphics.FromImage(Buffer);
-        DrawPolygonUsingGraphics(graphics, algorithmType);
-        SwapBitmaps();
-        ClearBuffer();
-        PictureBox.Refresh();
-    }
-    public void DrawPartialPolygon(Point point, AlgorithmType algorithmType)
-    {
-        using var graphics = Graphics.FromImage(Buffer);
-        DrawPartialPolygonUsingGraphics(graphics, point, algorithmType);
-        SwapBitmaps();
-        ClearBuffer();
-        PictureBox.Refresh();
+        (Buffer, PictureBox.Image) = ((PictureBox.Image as Bitmap)!, Buffer);
     }
     private void ClearBuffer()
     {
         using var graphicsBuffer = Graphics.FromImage(Buffer);
         graphicsBuffer.Clear(DrawingStyles.BackgroundColor);
     }
-    private void DrawPartialPolygonUsingGraphics(Graphics graphics, Point point, AlgorithmType algorithmType)
+    public void Dispose()
     {
-        graphics.DrawEdge(algorithmType, [.. CachedEdges]);
-        graphics.DrawEdge(algorithmType, CachedVertices[^1], point);
-        graphics.DrawVertex([.. CachedVertices]);
-    }
-    private void DrawPolygonUsingGraphics(Graphics graphics, AlgorithmType algorithmType)
-    {
-        if (Polygon == null)
-            return;
-
-        graphics.DrawEdge(algorithmType, [.. Polygon.Edges]);
-        graphics.FillPolygon(
-            DrawingStyles.PolygonFillBrush,
-            Polygon.Vertices
-                .Select(v => new PointF(v.X, v.Y))
-                .ToArray()
-        );
-        graphics.DrawVertex([.. Polygon.Vertices]);
-        graphics.DrawEdgeConstraints([.. Polygon.Edges]);
-        graphics.DrawVertexConstraint([.. Polygon.Vertices]);
+        Buffer.Dispose();
+        PictureBox.Image?.Dispose();
     }
 }

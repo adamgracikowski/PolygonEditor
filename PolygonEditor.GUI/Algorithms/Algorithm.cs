@@ -1,7 +1,5 @@
 ﻿using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms.VisualStyles;
 
 namespace PolygonEditor.GUI.Algorithms;
 
@@ -59,6 +57,91 @@ public static class Algorithm
         {
             // powrót do poprzedniego stanu
             return false;
+        }
+
+        return true;
+    }
+    public static bool MoveControlVertexWithConstraints(ControlVertex controlVertex, int x, int y, ref Polygon? polygon)
+    {
+        if (controlVertex.Parent == null) return false;
+
+        var (vertex, _, otherVertex, edge) = controlVertex.GetControlVertexConfiguration();
+
+        if (vertex == null || otherVertex == null || edge == null) return false;
+
+        if (vertex.ConstraintType == VertexConstraintType.G0 ||
+            vertex.ConstraintType == VertexConstraintType.None)
+        {
+            controlVertex.X = x;
+            controlVertex.Y = y;
+            return true;
+        }
+        else if (vertex.ConstraintType == VertexConstraintType.G1)
+        {
+            if (edge.ConstraintType == EdgeConstraintType.Vertical ||
+               edge.ConstraintType == EdgeConstraintType.Horizontal)
+            {
+                controlVertex.Point = Geometry.ProjectPointOnLine(new Point(x, y), otherVertex.Point, vertex.Point);
+                return true;
+            }
+            else
+            {
+                controlVertex.X = x;
+                controlVertex.Y = y;
+                otherVertex.Point = Geometry.PreserveG1(vertex.Point, otherVertex.Point, controlVertex.Point);
+
+                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+                {
+                    // powrót do poprzedniego stanu
+                    return false;
+                }
+
+                return true;
+            }
+        }
+        else if (vertex.ConstraintType == VertexConstraintType.C1)
+        {
+            if (edge.ConstraintType == EdgeConstraintType.Vertical ||
+                edge.ConstraintType == EdgeConstraintType.Horizontal)
+            {
+                controlVertex.Point = Geometry.ProjectPointOnLine(new Point(x, y), otherVertex.Point, vertex.Point);
+                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
+
+                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+                {
+                    // powrót do poprzedniego stanu
+                    return false;
+                }
+
+                return true;
+            }
+            else if (edge.ConstraintType == EdgeConstraintType.None)
+            {
+                controlVertex.X = x;
+                controlVertex.Y = y;
+                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
+
+                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+                {
+                    // powrót do poprzedniego stanu
+                    return false;
+                }
+
+                return true;
+            }
+            else if (edge.ConstraintType == EdgeConstraintType.FixedLength)
+            {
+                controlVertex.Point = Geometry.CircleLineIntersection(new Point(x, y), vertex.Point, edge.FixedLength / 3.0f);
+                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
+
+                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+                {
+                    // powrót do poprzedniego stanu
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         return true;
@@ -121,48 +204,6 @@ public static class Algorithm
         }
 
         return true; // temporary solution
-    }
-
-    [Obsolete("Works for polygons with no bezier edges only.")]
-    public static bool RestoreConstraintsObsolete(Vertex vertex)
-    {
-        var stack = new Stack<Vertex>();
-        var visited = new HashSet<Vertex>();
-
-        stack.Push(vertex);
-        visited.Add(vertex);
-
-        var iterations = 0;
-        var maxIterations = vertex.Parent?.Vertices.Count * 10;
-
-        while (stack.Count > 0 && iterations < maxIterations)
-        {
-            var current = stack.Pop();
-
-            foreach (var edge in current.Edges())
-            {
-                if (edge == null) continue;
-
-                var changed = false;
-                var other = edge.OtherVertex(current);
-
-                if (!edge.IsBezier && !edge.CheckConstraint())
-                {
-                    changed = true;
-                    edge.PreserveConstraint(current);
-                }
-
-                if (!visited.Contains(other) && changed && edge.ConstraintType != EdgeConstraintType.None)
-                {
-                    stack.Push(other);
-                    visited.Add(other);
-                }
-            }
-
-            iterations++;
-        }
-
-        return CheckAllConstraints(vertex.Parent);
     }
 
     public static bool CheckConstraint(this Edge edge)
@@ -308,111 +349,6 @@ public static class Algorithm
 
         return (vertex, controlVertex, otherVertex);
     }
-
-    public static bool CheckAllConstraints(Polygon? polygon)
-    {
-        return polygon != null &&
-            polygon.Edges.All(edge => edge.CheckConstraint()) &&
-            polygon.Vertices.All(vertex => vertex.CheckConstraint());
-    }
-
-    private static bool IsBezierNeighbour(this Edge edge, Vertex other)
-    {
-        var otherEdge = other
-            .Edges()
-            .FirstOrDefault(e => e != edge);
-
-        if (otherEdge == null) return false;
-
-        return otherEdge.IsBezier;
-    }
-
-    public static bool MoveControlVertexWithConstraints(ControlVertex controlVertex, int x, int y, ref Polygon? polygon)
-    {
-        if (controlVertex.Parent == null) return false;
-
-        var (vertex, _, otherVertex, edge) = controlVertex.GetControlVertexConfiguration();
-
-        if (vertex == null || otherVertex == null || edge == null) return false;
-
-        if (vertex.ConstraintType == VertexConstraintType.G0 ||
-            vertex.ConstraintType == VertexConstraintType.None)
-        {
-            controlVertex.X = x;
-            controlVertex.Y = y;
-            return true;
-        }
-        else if (vertex.ConstraintType == VertexConstraintType.G1)
-        {
-            if (edge.ConstraintType == EdgeConstraintType.Vertical ||
-               edge.ConstraintType == EdgeConstraintType.Horizontal)
-            {
-                controlVertex.Point = Geometry.ProjectPointOnLine(new Point(x, y), otherVertex.Point, vertex.Point);
-                return true;
-            }
-            else
-            {
-                controlVertex.X = x;
-                controlVertex.Y = y;
-                otherVertex.Point = Geometry.PreserveG1(vertex.Point, otherVertex.Point, controlVertex.Point);
-
-                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
-                {
-                    // powrót do poprzedniego stanu
-                    return false;
-                }
-
-                return true;
-            }
-        }
-        else if (vertex.ConstraintType == VertexConstraintType.C1)
-        {
-            if (edge.ConstraintType == EdgeConstraintType.Vertical ||
-                edge.ConstraintType == EdgeConstraintType.Horizontal)
-            {
-                controlVertex.Point = Geometry.ProjectPointOnLine(new Point(x, y), otherVertex.Point, vertex.Point);
-                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
-
-                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
-                {
-                    // powrót do poprzedniego stanu
-                    return false;
-                }
-
-                return true;
-            }
-            else if (edge.ConstraintType == EdgeConstraintType.None)
-            {
-                controlVertex.X = x;
-                controlVertex.Y = y;
-                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
-
-                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
-                {
-                    // powrót do poprzedniego stanu
-                    return false;
-                }
-
-                return true;
-            }
-            else if (edge.ConstraintType == EdgeConstraintType.FixedLength)
-            {
-                controlVertex.Point = Geometry.CircleLineIntersection(new Point(x, y), vertex.Point, edge.FixedLength / 3.0f);
-                otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
-
-                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
-                {
-                    // powrót do poprzedniego stanu
-                    return false;
-                }
-
-                return true;
-            }
-        }
-
-        return true;
-    }
-
     private static (Vertex? vertex, ControlVertex? controlVertex, Vertex? otherVertex, Edge? edge) GetControlVertexConfiguration(this ControlVertex controlVertex)
     {
         Vertex? vertex = null;
@@ -435,5 +371,65 @@ public static class Algorithm
         otherVertex = edge?.OtherVertex(vertex);
 
         return (vertex, controlVertex, otherVertex, edge);
+    }
+
+    public static bool CheckAllConstraints(Polygon? polygon)
+    {
+        return polygon != null &&
+            polygon.Edges.All(edge => edge.CheckConstraint()) &&
+            polygon.Vertices.All(vertex => vertex.CheckConstraint());
+    }
+
+    private static bool IsBezierNeighbour(this Edge edge, Vertex other)
+    {
+        var otherEdge = other
+            .Edges()
+            .FirstOrDefault(e => e != edge);
+
+        if (otherEdge == null) return false;
+
+        return otherEdge.IsBezier;
+    }
+    
+    [Obsolete("Works for polygons with no bezier edges only.")]
+    public static bool RestoreConstraintsObsolete(Vertex vertex)
+    {
+        var stack = new Stack<Vertex>();
+        var visited = new HashSet<Vertex>();
+
+        stack.Push(vertex);
+        visited.Add(vertex);
+
+        var iterations = 0;
+        var maxIterations = vertex.Parent?.Vertices.Count * 10;
+
+        while (stack.Count > 0 && iterations < maxIterations)
+        {
+            var current = stack.Pop();
+
+            foreach (var edge in current.Edges())
+            {
+                if (edge == null) continue;
+
+                var changed = false;
+                var other = edge.OtherVertex(current);
+
+                if (!edge.IsBezier && !edge.CheckConstraint())
+                {
+                    changed = true;
+                    edge.PreserveConstraint(current);
+                }
+
+                if (!visited.Contains(other) && changed && edge.ConstraintType != EdgeConstraintType.None)
+                {
+                    stack.Push(other);
+                    visited.Add(other);
+                }
+            }
+
+            iterations++;
+        }
+
+        return CheckAllConstraints(vertex.Parent);
     }
 }

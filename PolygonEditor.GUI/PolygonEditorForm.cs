@@ -10,6 +10,7 @@ public partial class PolygonEditorForm : Form
     public EditorMode EditorMode { get; set; } = EditorMode.EditingPolygon;
     public AlgorithmType AlgorithmType { get; set; } = AlgorithmType.Library;
     public PolygonContainer PolygonContainer { get; set; }
+    
     public PolygonEditorForm()
     {
         InitializeComponent();
@@ -31,21 +32,13 @@ public partial class PolygonEditorForm : Form
         {
             if (!PolygonContainer.MoveSelectedVertexWithConstraints(e.Location))
             {
-                //PolygonContainer.PolygonMovingState.Clear();
-                //EditorMode = EditorMode.EditingPolygon;
 
-                //MessageBox.Show(
-                //    "Imposed constraints don't allow for the specified move",
-                //    "Invalid operation",
-                //    MessageBoxButtons.OK,
-                //    MessageBoxIcon.Information
-                //);
             }
+
             PolygonContainer.DrawPolygon(AlgorithmType);
         }
         else if (EditorMode == EditorMode.MovingControlVertex)
         {
-            //PolygonContainer.MoveSelectedControlVertex(e.Location);
             PolygonContainer.MoveSelectedControlVertexWithConstraints(e.Location);
             PolygonContainer.DrawPolygon(AlgorithmType);
         }

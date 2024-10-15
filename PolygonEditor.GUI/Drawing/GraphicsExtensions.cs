@@ -2,8 +2,6 @@
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
 using PolygonEditor.GUI.Properties;
-using System.Drawing;
-using System.Reflection;
 
 namespace PolygonEditor.GUI.Drawing;
 

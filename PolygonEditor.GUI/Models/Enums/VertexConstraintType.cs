@@ -1,4 +1,5 @@
 ﻿namespace PolygonEditor.GUI.Models.Enums;
+
 public enum VertexConstraintType
 {
     None,
