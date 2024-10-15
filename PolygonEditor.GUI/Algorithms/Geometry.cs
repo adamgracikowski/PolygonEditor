@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Windows.Forms.VisualStyles;
 
 namespace PolygonEditor.GUI.Algorithms;
 public static class Geometry
@@ -16,28 +15,7 @@ public static class Geometry
         var q = sV + Vector2.Normalize(direction) * r;
         return new Point((int)q.X, (int)q.Y);
     }
-    public static Point PreserveG1(Point s, Point r, Point p)
-    {
-        var sV = new Vector2(s.X, s.Y);
-        var rV = new Vector2(r.X, r.Y);
-        var pV = new Vector2(p.X, p.Y);
-
-        var direction = sV - rV;
-        var length = (pV - sV).Length();
-
-        var t = sV + Vector2.Normalize(direction) * length;
-        return new Point((int)t.X, (int)t.Y);
-    }
-
-    public static Point PreserveC1(Point s, Point r)
-    {
-        var sV = new Vector2(s.X, s.Y);
-        var rV = new Vector2(r.X, r.Y);
-
-        var t = 3 * (sV - rV);
-        return new Point((int)t.X, (int)t.Y);
-    }
-
+    
     public static bool CheckG1(Point s, Point r, Point p)
     {
         var sV = new Vector2(s.X, s.Y);
@@ -51,18 +29,59 @@ public static class Geometry
         var cross = sr.X * sp.Y - sr.Y * sp.X;
         return dot < 0 && Math.Abs(cross) < PolygonEditorConstants.Epsilon;
     }
-
     public static bool CheckC1(Point s, Point r, Point p)
     {
         var sV = new Vector2(s.X, s.Y);
         var rV = new Vector2(r.X, r.Y);
         var pV = new Vector2(p.X, p.Y);
-
-        var rs = sV - rV;
-        var sp = pV - sV;
+        var t = pV - sV - 3 * (sV - rV);
 
         var epsilon = PolygonEditorConstants.Epsilon;
 
-        return Math.Abs(rs.X - 3 * sp.X) < epsilon && Math.Abs(rs.Y - 3 * sp.Y) < epsilon;
+        return Math.Abs(t.X) < epsilon && Math.Abs(t.Y) < epsilon;
     }
+    public static Point PreserveG1(Point s, Point r, Point p)
+    {
+        var sV = new Vector2(s.X, s.Y);
+        var rV = new Vector2(r.X, r.Y);
+        var pV = new Vector2(p.X, p.Y);
+
+        var direction = sV - pV;
+        var length = (rV - sV).Length();
+        var t = sV + Vector2.Normalize(direction) * length;
+        return new Point((int)t.X, (int)t.Y);
+    }
+    public static Point PreserveC1(Point s, Point p)
+    {
+        var sV = new Vector2(s.X, s.Y);
+        var pV = new Vector2(p.X, p.Y);
+
+        var t = sV + (sV - pV) / 3;
+        return new Point((int)t.X, (int)t.Y);
+    }
+
+
+    // jeszcze nie działa dobrze
+    public static Point PreserveG1FromControlVertex(Point s, Point r, Point p)
+    {
+        var sV = new Vector2(s.X, s.Y);
+        var rV = new Vector2(r.X, r.Y);
+        var pV = new Vector2(p.X, p.Y);
+
+        var direction = sV - rV;
+        var length = (pV - sV).Length();
+
+        var t = sV + Vector2.Normalize(direction) * length;
+        return new Point((int)t.X, (int)t.Y);
+    }
+    public static Point PreserveC1FromControlVertex(Point s, Point r, Point p)
+    {
+        var sV = new Vector2(s.X, s.Y);
+        var rV = new Vector2(r.X, r.Y);
+
+        var t = 3 * (sV - rV);
+        return new Point((int)t.X, (int)t.Y);
+    }
+    
+    
 }
