@@ -50,12 +50,14 @@ public static class Algorithm
     {
         if (vertex.Parent == null) return false;
 
+        var copy = new PolygonPosition(vertex.Parent);
+
         vertex.X = x;
         vertex.Y = y;
 
         if (!RestoreConstraints(vertex))
         {
-            // powrót do poprzedniego stanu
+            copy.RestorePosition(vertex.Parent);
             return false;
         }
 
@@ -68,6 +70,8 @@ public static class Algorithm
         var (vertex, _, otherVertex, edge) = controlVertex.GetControlVertexConfiguration();
 
         if (vertex == null || otherVertex == null || edge == null) return false;
+
+        var copy = new PolygonPosition(controlVertex.Parent);
 
         if (vertex.ConstraintType == VertexConstraintType.G0 ||
             vertex.ConstraintType == VertexConstraintType.None)
@@ -92,7 +96,7 @@ public static class Algorithm
 
                 if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
                 {
-                    // powrót do poprzedniego stanu
+                    copy.RestorePosition(controlVertex.Parent);
                     return false;
                 }
 
@@ -109,7 +113,7 @@ public static class Algorithm
 
                 if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
                 {
-                    // powrót do poprzedniego stanu
+                    copy.RestorePosition(controlVertex.Parent);
                     return false;
                 }
 
@@ -123,7 +127,7 @@ public static class Algorithm
 
                 if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
                 {
-                    // powrót do poprzedniego stanu
+                    copy.RestorePosition(controlVertex.Parent);
                     return false;
                 }
 
@@ -136,7 +140,7 @@ public static class Algorithm
 
                 if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
                 {
-                    // powrót do poprzedniego stanu
+                    copy.RestorePosition(controlVertex.Parent);
                     return false;
                 }
 
