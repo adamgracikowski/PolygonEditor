@@ -1,0 +1,36 @@
+Top Menu Functionalities:
+"File":
+	"Algorithm" – change the drawing algorithm.
+	"Clear"     – clear the drawing area.
+	"Exit"      – close the application.
+	"Save"      – export the polygon to a .json file.
+	"Load"      – import the polygon from a .json file.
+
+Creating a New Polygon:
+- Right-click on an empty area of the window and select "Create polygon".
+- Place subsequent vertices on the screen by clicking with the left mouse button.
+- To finish creating the polygon, select the starting vertex.
+- To remove a partially created polygon, press the Escape key.
+
+Deleting a Polygon:
+- Right-click and select "Delete polygon".
+
+Moving a Polygon:
+- Hold down the left mouse button to move the polygon.
+
+Vertex Management:
+- Right-click while hovering over a vertex and select the desired option from the context menu.
+- "Delete vertex" allows you to remove a vertex and its adjacent edges.
+- "Constraints" lets you select a constraint applied to the vertex (continuity of the Bezier segment with a line segment).
+- To move a vertex, hold down the left mouse button over the vertex.
+
+Edge Management:
+- Right-click while hovering over an edge and select the desired option from the context menu.
+- "Add vertex" adds a new vertex at the middle of the edge.
+- "Bezier" toggles the edge to a Bezier segment.
+- "Constraints" allows you to select a constraint applied to the edge.
+- The constraint will be activated when you move the vertex.
+
+Bezier Segment Management:
+- Right-click on the control point to revert the edge back to a straight segment.
+- To move the control point, hold down the left mouse button.

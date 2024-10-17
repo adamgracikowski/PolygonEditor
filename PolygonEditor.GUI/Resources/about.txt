@@ -1,0 +1,7 @@
+Polygon Editor is a simple application that allows creating polygons with constraints on edges and vertices.
+
+The project was completed as part of the Computer Graphics course at the Warsaw University of Technology during the winter semester of the 2024-2025 academic year.
+
+Constraint Preservation Algorithm:
+
+The algorithm starts from the activated vertex and iteratively adjusts the constraints on the edges and vertices in one direction until it encounters either the starting vertex or an edge without a set constraint (which can be modified freely). It then corrects the constraints by traversing the edges and vertices in the opposite direction. If the adjustment would require modifying a vertex position set by the user, the algorithm reverts the polygon to its initial state, determining that such a move is not possible.

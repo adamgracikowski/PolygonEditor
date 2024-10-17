@@ -1,4 +1,6 @@
-﻿using PolygonEditor.GUI.Models;
+﻿#define MAX_ITERATION
+
+using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
 
 namespace PolygonEditor.GUI.Algorithms;
@@ -154,7 +156,15 @@ public static class Algorithm
     {
         Vertex current = vertex;
 
-        while (true)
+#if MAX_ITERATION
+        var maxIteration = 50;
+        var iteration = 0;
+
+        while (iteration++ < maxIteration)
+#else
+        while(true)
+#endif
+
         {
             var edge = edgeDirection(current);
 
@@ -177,8 +187,9 @@ public static class Algorithm
             {
                 if (!edge.CheckConstraint())
                 {
+#if !MAX_ITERATION
                     if (other == vertex) return false;
-
+#endif
                     edge.PreserveConstraint(current);
                     current = other;
                 }
@@ -193,7 +204,11 @@ public static class Algorithm
             }
         }
 
+#if MAX_ITERATION
+        return iteration < maxIteration;
+#else
         return true;
+#endif
     }
     public static bool RestoreConstraints(Vertex vertex)
     {
@@ -207,7 +222,7 @@ public static class Algorithm
             return false;
         }
 
-        return true; // temporary solution
+        return true;
     }
 
     public static bool CheckConstraint(this Edge edge)
@@ -394,7 +409,7 @@ public static class Algorithm
 
         return otherEdge.IsBezier;
     }
-    
+
     [Obsolete("Works for polygons with no bezier edges only.")]
     public static bool RestoreConstraintsObsolete(Vertex vertex)
     {

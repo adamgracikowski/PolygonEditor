@@ -27,7 +27,17 @@ public static class Geometry
 
         return new Point((int)t.X, (int)t.Y);
     }
+    public static Point OffsetPreserveLength(Point p, Point s, float length)
+    {
+        var pV = new Vector2(p.X, p.Y);
+        var sV = new Vector2(s.X, s.Y);
 
+        var sp = pV - sV;
+        var direction = Vector2.Normalize(sp);
+        var t = sV + direction * length;
+
+        return new Point((int)t.X, (int)t.Y);
+    }
     public static bool CheckG1(Point s, Point r, Point p)
     {
         var sV = new Vector2(s.X, s.Y);

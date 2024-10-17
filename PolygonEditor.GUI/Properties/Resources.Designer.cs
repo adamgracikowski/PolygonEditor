@@ -61,6 +61,21 @@ namespace PolygonEditor.GUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Polygon Editor is a simple application that allows creating polygons with constraints on edges and vertices.
+        ///
+        ///The project was completed as part of the Computer Graphics course at the Warsaw University of Technology during the winter semester of the 2024-2025 academic year.
+        ///
+        ///Constraint Preservation Algorithm:
+        ///
+        ///The algorithm starts from the activated vertex and iteratively adjusts the constraints on the edges and vertices in one direction until it encounters either the starting vertex or an edge without [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string about {
+            get {
+                return ResourceManager.GetString("about", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap create {
@@ -97,6 +112,26 @@ namespace PolygonEditor.GUI.Properties {
             get {
                 object obj = ResourceManager.GetObject("ruler", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Top Menu Functionalities:
+        ///&quot;File&quot;:
+        ///	&quot;Algorithm&quot; – change the drawing algorithm.
+        ///	&quot;Clear&quot;     – clear the drawing area.
+        ///	&quot;Exit&quot;      – close the application.
+        ///	&quot;Save&quot;      – export the polygon to a .json file.
+        ///	&quot;Load&quot;      – import the polygon from a .json file.
+        ///
+        ///Creating a New Polygon:
+        ///- Right-click on an empty area of the window and select &quot;Create polygon&quot;.
+        ///- Place subsequent vertices on the screen by clicking with the left mouse button.
+        ///- To finish creating the polygon, select the starting vertex [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string userguide {
+            get {
+                return ResourceManager.GetString("userguide", resourceCulture);
             }
         }
         

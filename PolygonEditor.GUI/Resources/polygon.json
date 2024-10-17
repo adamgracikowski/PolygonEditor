@@ -1,36 +1,57 @@
 {
   "Position": [
     {
-      "Item1": "339, 144",
+      "Item1": "247, 100",
+      "Item2": "156, 100",
+      "Item3": "90, 142"
+    },
+    {
+      "Item1": "135, 209",
       "Item2": null,
       "Item3": null
     },
     {
-      "Item1": "163, 150",
+      "Item1": "269, 408",
       "Item2": null,
       "Item3": null
     },
     {
-      "Item1": "276, 379",
+      "Item1": "449, 408",
+      "Item2": "509, 408",
+      "Item3": "348, 287"
+    },
+    {
+      "Item1": "429, 264",
       "Item2": null,
       "Item3": null
     },
     {
-      "Item1": "626, 379",
-      "Item2": "742, 379",
-      "Item3": "397, 142"
+      "Item1": "648, 201",
+      "Item2": null,
+      "Item3": null
+    },
+    {
+      "Item1": "648, 100",
+      "Item2": null,
+      "Item3": null
     }
   ],
   "EdgeConstraints": [
-    3,
+    0,
     3,
     1,
-    0
+    0,
+    3,
+    2,
+    1
   ],
   "VertexConstraints": [
+    2,
     3,
     0,
+    3,
+    3,
     0,
-    3
+    0
   ]
 }

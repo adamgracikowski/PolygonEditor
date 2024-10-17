@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PolygonEditor.GUI.Algorithms;
 using PolygonEditor.GUI.Drawing;
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
@@ -393,8 +394,41 @@ public partial class PolygonEditorForm : Form
 
                             return;
                         }
+                        else if (constraintType == EdgeConstraintType.FixedLength)
+                        {
+                            using var fixedLengthForm = new FixedLengthForm(edge.Length);
 
-                        edge.ApplyEdgeConstraint(constraintType);
+                            if (fixedLengthForm.ShowDialog() == DialogResult.OK && fixedLengthForm.SetConstraint)
+                            {
+                                var check = Math.Abs(fixedLengthForm.Length - edge.Length) > PolygonEditorConstants.Epsilon;
+                                var copy = new PolygonPosition(PolygonContainer.Polygon);
+
+                                edge.FixedLength = fixedLengthForm.Length;
+                                edge.ConstraintType = EdgeConstraintType.FixedLength;
+
+                                if (check)
+                                {
+                                    edge.End.Point = Geometry.OffsetPreserveLength(edge.End.Point, edge.Start.Point, edge.FixedLength);
+                                    if (!Algorithm.RestoreConstraints(edge.End))
+                                    {
+                                        copy.RestorePosition(PolygonContainer.Polygon);
+
+                                        MessageBox.Show(
+                                            "This constraint can't be satisfied.",
+                                            "Invalid operation",
+                                            MessageBoxButtons.OK,
+                                            MessageBoxIcon.Information
+                                        );
+                                    }
+
+                                }
+
+                                PolygonContainer.DrawPolygon(AlgorithmType);
+                            }
+                            return;
+                        }
+
+                        edge.ConstraintType = constraintType;
                         PolygonContainer.DrawPolygon(AlgorithmType);
                     };
                 }
@@ -472,7 +506,6 @@ public partial class PolygonEditorForm : Form
         PolygonContainer.Dispose();
         DrawingStyles.Dispose();
     }
-
     private bool LoadDefaultPolygon()
     {
         try
@@ -480,10 +513,10 @@ public partial class PolygonEditorForm : Form
             var json = Encoding.UTF8.GetString(Resources.polygon);
             var polygonPosition = JsonConvert.DeserializeObject<PolygonPosition>(json)
                 ?? throw new Exception("Invalid format of the JSON file.");
-            
+
             PolygonContainer.Polygon = polygonPosition.BuildPolygon();
             PolygonContainer.DrawPolygon(AlgorithmType);
-            
+
             return true;
         }
         catch (Exception ex)
@@ -497,5 +530,29 @@ public partial class PolygonEditorForm : Form
 
             return false;
         }
+    }
+
+    private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        var about = Resources.about;
+
+        MessageBox.Show(
+            about,
+            "About Polygon Editor",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Information
+        );
+    }
+
+    private void UserGuideToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        var userguide = Resources.userguide;
+
+        MessageBox.Show(
+            userguide,
+            "User Guide",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Information
+        );
     }
 }

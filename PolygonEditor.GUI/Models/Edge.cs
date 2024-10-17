@@ -112,18 +112,6 @@ public sealed class Edge : ISelectable
             End.PreserveG1();
         }
     }
-    public void ApplyEdgeConstraint(EdgeConstraintType constraintType)
-    {
-        if (ConstraintType == constraintType)
-            return;
-
-        if(constraintType == EdgeConstraintType.FixedLength)
-        {
-            FixedLength = Length;
-        }
-
-        ConstraintType = constraintType;
-    }
     private void SetDefaultControlPoints(float k = 0.5f)
     {
         float mx = (Start.X + End.X) / 2;
