@@ -13,8 +13,7 @@ public sealed class Polygon : ISelectable
         Vertices = vertices;
         Edges = edges;
 
-        Vertices.ForEach(v => v.Parent = this);
-        Edges.ForEach(e => e.Parent = this);
+        SetSelfAsParent();
     }
 
     public bool DeleteVertex(Vertex vertex)
@@ -92,5 +91,10 @@ public sealed class Polygon : ISelectable
         using var graphicsPath = new GraphicsPath();
         graphicsPath.AddPolygon(Vertices.Select(v => v.Point).ToArray());
         return graphicsPath.IsVisible(x, y);
+    }
+    public void SetSelfAsParent()
+    {
+        Vertices.ForEach(v => v.Parent = this);
+        Edges.ForEach(e => e.Parent = this);
     }
 }

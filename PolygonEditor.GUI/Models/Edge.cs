@@ -90,16 +90,27 @@ public sealed class Edge : ISelectable
     {
         if (IsBezier)
         {
+            IsBezier = false;
+
             FirstControlVertex = null;
             SecondControlVertex = null;
+
+            Start.ConstraintType = VertexConstraintType.None;
+            End.ConstraintType = VertexConstraintType.None;
         }
         else
         {
-            ConstraintType = EdgeConstraintType.None;
-            SetDefaultControlPoints();
-        }
+            IsBezier = true;
 
-        IsBezier = !IsBezier;
+            ConstraintType = EdgeConstraintType.None;
+            Start.ConstraintType = VertexConstraintType.G1;
+            End.ConstraintType = VertexConstraintType.G1;
+
+            SetDefaultControlPoints();
+
+            Start.PreserveG1();
+            End.PreserveG1();
+        }
     }
     public void ApplyEdgeConstraint(EdgeConstraintType constraintType)
     {

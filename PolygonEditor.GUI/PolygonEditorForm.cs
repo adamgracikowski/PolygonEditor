@@ -1,7 +1,9 @@
-﻿using PolygonEditor.GUI.Drawing;
+﻿using Newtonsoft.Json;
+using PolygonEditor.GUI.Drawing;
 using PolygonEditor.GUI.Models;
 using PolygonEditor.GUI.Models.Enums;
 using PolygonEditor.GUI.Properties;
+using System.Text;
 
 namespace PolygonEditor.GUI;
 public partial class PolygonEditorForm : Form
@@ -10,11 +12,13 @@ public partial class PolygonEditorForm : Form
     public EditorMode EditorMode { get; set; } = EditorMode.EditingPolygon;
     public AlgorithmType AlgorithmType { get; set; } = AlgorithmType.Library;
     public PolygonContainer PolygonContainer { get; set; }
-    
+
     public PolygonEditorForm()
     {
         InitializeComponent();
         PolygonContainer = new(PictureBox);
+
+        LoadDefaultPolygon();
     }
 
     private void PictureBox_MouseMove(object sender, MouseEventArgs e)
@@ -164,6 +168,89 @@ public partial class PolygonEditorForm : Form
             if (EditorMode == EditorMode.EditingPolygon)
             {
                 PolygonContainer.DrawPolygon(AlgorithmType);
+            }
+        }
+    }
+    private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        if (sender != LoadToolStripMenuItem) return;
+
+        using var openFileDialog = new OpenFileDialog
+        {
+            Filter = "JSON files (*.json)|*.json",
+            Title = "Save polygon to JSON"
+        };
+
+        if (openFileDialog.ShowDialog() == DialogResult.OK)
+        {
+            try
+            {
+                var json = File.ReadAllText(openFileDialog.FileName);
+                var polygonPosition = JsonConvert.DeserializeObject<PolygonPosition>(json)
+                    ?? throw new Exception("Invalid format of the JSON file.");
+
+                EditorMode = EditorMode.EditingPolygon;
+                PolygonContainer.ClearContainer();
+                PolygonContainer.Polygon = polygonPosition.BuildPolygon();
+                PolygonContainer.DrawPolygon(AlgorithmType);
+
+                MessageBox.Show(
+                    "Polygon loaded successfully!",
+                    "Success",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
+        }
+    }
+    private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        if (sender != SaveToolStripMenuItem ||
+            PolygonContainer.Polygon == null ||
+            EditorMode == EditorMode.CreatingPolygon)
+        {
+            return;
+        }
+
+        using var saveFileDialog = new SaveFileDialog
+        {
+            Filter = "JSON files (*.json)|*.json",
+            Title = "Save polygon to JSON"
+        };
+
+        if (saveFileDialog.ShowDialog() == DialogResult.OK)
+        {
+            try
+            {
+                var polygonPosition = new PolygonPosition(PolygonContainer.Polygon);
+                var json = JsonConvert.SerializeObject(polygonPosition, Formatting.Indented);
+
+                File.WriteAllText(saveFileDialog.FileName, json);
+
+                MessageBox.Show(
+                    "Polygon exported successfully!",
+                    "Success",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
         }
     }
@@ -384,5 +471,31 @@ public partial class PolygonEditorForm : Form
     {
         PolygonContainer.Dispose();
         DrawingStyles.Dispose();
+    }
+
+    private bool LoadDefaultPolygon()
+    {
+        try
+        {
+            var json = Encoding.UTF8.GetString(Resources.polygon);
+            var polygonPosition = JsonConvert.DeserializeObject<PolygonPosition>(json)
+                ?? throw new Exception("Invalid format of the JSON file.");
+            
+            PolygonContainer.Polygon = polygonPosition.BuildPolygon();
+            PolygonContainer.DrawPolygon(AlgorithmType);
+            
+            return true;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Error: {ex.Message}",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+
+            return false;
+        }
     }
 }

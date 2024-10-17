@@ -186,7 +186,6 @@ public sealed class PolygonContainer : IDisposable
         DrawPartialPolygon(point, algorithmType);
         return false;
     }
-
     public void Resize(AlgorithmType algorithmType)
     {
         var oldBuffer = Buffer;

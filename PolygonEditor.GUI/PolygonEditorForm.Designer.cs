@@ -40,6 +40,8 @@ partial class PolygonEditorForm
         AboutToolStripMenuItem = new ToolStripMenuItem();
         UserGuideToolStripMenuItem = new ToolStripMenuItem();
         PictureBox = new PictureBox();
+        LoadToolStripMenuItem = new ToolStripMenuItem();
+        SaveToolStripMenuItem = new ToolStripMenuItem();
         UpperMenuStrip.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)PictureBox).BeginInit();
         SuspendLayout();
@@ -56,7 +58,7 @@ partial class PolygonEditorForm
         // 
         // FileToolStripMenuItem
         // 
-        FileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { AlgorithmToolStripMenuItem, ClearToolStripMenuItem, ExitToolStripMenuItem });
+        FileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { AlgorithmToolStripMenuItem, ClearToolStripMenuItem, ExitToolStripMenuItem, LoadToolStripMenuItem, SaveToolStripMenuItem });
         FileToolStripMenuItem.Name = "FileToolStripMenuItem";
         FileToolStripMenuItem.Size = new Size(46, 24);
         FileToolStripMenuItem.Text = "&File";
@@ -72,7 +74,7 @@ partial class PolygonEditorForm
         // CustomToolStripMenuItem
         // 
         CustomToolStripMenuItem.Name = "CustomToolStripMenuItem";
-        CustomToolStripMenuItem.Size = new Size(224, 26);
+        CustomToolStripMenuItem.Size = new Size(142, 26);
         CustomToolStripMenuItem.Text = "Custom";
         CustomToolStripMenuItem.Click += CustomToolStripMenuItem_Click;
         // 
@@ -81,7 +83,7 @@ partial class PolygonEditorForm
         LibraryToolStripMenuItem.Checked = true;
         LibraryToolStripMenuItem.CheckState = CheckState.Checked;
         LibraryToolStripMenuItem.Name = "LibraryToolStripMenuItem";
-        LibraryToolStripMenuItem.Size = new Size(224, 26);
+        LibraryToolStripMenuItem.Size = new Size(142, 26);
         LibraryToolStripMenuItem.Text = "Library";
         LibraryToolStripMenuItem.Click += LibraryToolStripMenuItem_Click;
         // 
@@ -135,6 +137,22 @@ partial class PolygonEditorForm
         PictureBox.MouseMove += PictureBox_MouseMove;
         PictureBox.MouseUp += PictureBox_MouseUp;
         // 
+        // LoadToolStripMenuItem
+        // 
+        LoadToolStripMenuItem.Image = (Image)resources.GetObject("LoadToolStripMenuItem.Image");
+        LoadToolStripMenuItem.Name = "LoadToolStripMenuItem";
+        LoadToolStripMenuItem.Size = new Size(224, 26);
+        LoadToolStripMenuItem.Text = "&Load";
+        LoadToolStripMenuItem.Click += LoadToolStripMenuItem_Click;
+        // 
+        // SaveToolStripMenuItem
+        // 
+        SaveToolStripMenuItem.Image = (Image)resources.GetObject("SaveToolStripMenuItem.Image");
+        SaveToolStripMenuItem.Name = "SaveToolStripMenuItem";
+        SaveToolStripMenuItem.Size = new Size(224, 26);
+        SaveToolStripMenuItem.Text = "&Save";
+        SaveToolStripMenuItem.Click += SaveToolStripMenuItem_Click;
+        // 
         // PolygonEditorForm
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
@@ -167,4 +185,6 @@ partial class PolygonEditorForm
     private ToolStripMenuItem AlgorithmToolStripMenuItem;
     private ToolStripMenuItem CustomToolStripMenuItem;
     private ToolStripMenuItem LibraryToolStripMenuItem;
+    private ToolStripMenuItem LoadToolStripMenuItem;
+    private ToolStripMenuItem SaveToolStripMenuItem;
 }

@@ -1,0 +1,36 @@
+{
+  "Position": [
+    {
+      "Item1": "339, 144",
+      "Item2": null,
+      "Item3": null
+    },
+    {
+      "Item1": "163, 150",
+      "Item2": null,
+      "Item3": null
+    },
+    {
+      "Item1": "276, 379",
+      "Item2": null,
+      "Item3": null
+    },
+    {
+      "Item1": "626, 379",
+      "Item2": "742, 379",
+      "Item3": "397, 142"
+    }
+  ],
+  "EdgeConstraints": [
+    3,
+    3,
+    1,
+    0
+  ],
+  "VertexConstraints": [
+    3,
+    0,
+    0,
+    3
+  ]
+}
