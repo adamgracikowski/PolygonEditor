@@ -12,8 +12,12 @@ public static class Geometry
         var pV = new Vector2(p.X, p.Y);
         var sV = new Vector2(s.X, s.Y);
         var direction = pV - sV;
-        var q = sV + Vector2.Normalize(direction) * r;
-        return new Point((int)q.X, (int)q.Y);
+
+        var t = sV + Vector2.Normalize(direction) * r;
+
+        t.CheckVector2Overflow();
+
+        return new Point((int)t.X, (int)t.Y);
     }
     public static Point ProjectPointOnLine(Point p, Point s, Point r)
     {
@@ -25,6 +29,8 @@ public static class Geometry
         var dot = Vector2.Dot(pV - sV, lineDirectionNormalized);
         var t = sV + lineDirectionNormalized * dot;
 
+        t.CheckVector2Overflow();
+
         return new Point((int)t.X, (int)t.Y);
     }
     public static Point OffsetPreserveLength(Point p, Point s, float length)
@@ -35,6 +41,8 @@ public static class Geometry
         var sp = pV - sV;
         var direction = Vector2.Normalize(sp);
         var t = sV + direction * length;
+        
+        t.CheckVector2Overflow();
 
         return new Point((int)t.X, (int)t.Y);
     }
@@ -71,6 +79,13 @@ public static class Geometry
         var direction = sV - pV;
         var length = (rV - sV).Length();
         var t = sV + Vector2.Normalize(direction) * length;
+
+        if (Math.Abs(t.X) > int.MaxValue / 2 ||
+            Math.Abs(t.Y) > int.MaxValue / 2)
+        {
+            t = rV;
+        }
+
         return new Point((int)t.X, (int)t.Y);
     }
     public static Point PreserveC1(Point s, Point p, float k = 3.0f)
@@ -79,6 +94,22 @@ public static class Geometry
         var pV = new Vector2(p.X, p.Y);
 
         var t = sV + (sV - pV) / k;
+
+        if (Math.Abs(t.X) > int.MaxValue / 2 ||
+            Math.Abs(t.Y) > int.MaxValue / 2)
+        {
+            t = sV;
+        }
+
         return new Point((int)t.X, (int)t.Y);
-    }    
+    }
+
+    public static void CheckVector2Overflow(this Vector2 vector)
+    {
+        if (Math.Abs(vector.X) > int.MaxValue / 2 ||
+            Math.Abs(vector.Y) > int.MaxValue / 2)
+        {
+            throw new Exception();
+        }
+    }
 }

@@ -48,24 +48,29 @@ public static class Algorithm
 
         yield break;
     }
-    public static bool MoveVertexWithConstraints(Vertex vertex, int x, int y, ref Polygon? polygon)
+    public static bool MoveVertexWithConstraints(Vertex vertex, int x, int y, bool makeCopy = true)
     {
         if (vertex.Parent == null) return false;
 
-        var copy = new PolygonPosition(vertex.Parent);
+        PolygonPosition? copy = null;
+
+        if (makeCopy)
+        {
+            copy = new PolygonPosition(vertex.Parent);
+        }
 
         vertex.X = x;
         vertex.Y = y;
 
         if (!RestoreConstraints(vertex))
         {
-            copy.RestorePosition(vertex.Parent);
+            copy?.RestorePosition(vertex.Parent);
             return false;
         }
 
         return true;
     }
-    public static bool MoveControlVertexWithConstraints(ControlVertex controlVertex, int x, int y, ref Polygon? polygon)
+    public static bool MoveControlVertexWithConstraints(ControlVertex controlVertex, int x, int y)
     {
         if (controlVertex.Parent == null) return false;
 
@@ -95,14 +100,6 @@ public static class Algorithm
                 controlVertex.X = x;
                 controlVertex.Y = y;
                 otherVertex.Point = Geometry.PreserveG1(vertex.Point, otherVertex.Point, controlVertex.Point);
-
-                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
-                {
-                    copy.RestorePosition(controlVertex.Parent);
-                    return false;
-                }
-
-                return true;
             }
         }
         else if (vertex.ConstraintType == VertexConstraintType.C1)
@@ -112,42 +109,24 @@ public static class Algorithm
             {
                 controlVertex.Point = Geometry.ProjectPointOnLine(new Point(x, y), otherVertex.Point, vertex.Point);
                 otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
-
-                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
-                {
-                    copy.RestorePosition(controlVertex.Parent);
-                    return false;
-                }
-
-                return true;
             }
             else if (edge.ConstraintType == EdgeConstraintType.None)
             {
                 controlVertex.X = x;
                 controlVertex.Y = y;
                 otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
-
-                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
-                {
-                    copy.RestorePosition(controlVertex.Parent);
-                    return false;
-                }
-
-                return true;
             }
             else if (edge.ConstraintType == EdgeConstraintType.FixedLength)
             {
                 controlVertex.Point = Geometry.CircleLineIntersection(new Point(x, y), vertex.Point, edge.FixedLength / 3.0f);
                 otherVertex.Point = Geometry.PreserveC1(vertex.Point, controlVertex.Point, k: 1 / 3.0f);
-
-                if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
-                {
-                    copy.RestorePosition(controlVertex.Parent);
-                    return false;
-                }
-
-                return true;
             }
+        }
+
+        if (!RestoreLoop(otherVertex, v => edge == otherVertex.FirstEdge ? v.SecondEdge : v.FirstEdge))
+        {
+            copy.RestorePosition(controlVertex.Parent);
+            return false;
         }
 
         return true;

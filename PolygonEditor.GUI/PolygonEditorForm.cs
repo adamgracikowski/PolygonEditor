@@ -35,17 +35,27 @@ public partial class PolygonEditorForm : Form
         }
         else if (EditorMode == EditorMode.MovingVertex)
         {
-            if (!PolygonContainer.MoveSelectedVertexWithConstraints(e.Location))
+            var copy = new PolygonPosition(PolygonContainer.Polygon!);
+            PolygonContainer.MoveSelectedVertexWithConstraints(e.Location, makeCopy: false);
+            if (!PolygonContainer.DrawPolygon(AlgorithmType))
             {
-
+                copy.RestorePosition(PolygonContainer.Polygon);
+                PolygonContainer.DrawPolygon(AlgorithmType);
+                ShowInvalidPolygonStateMessageBox();
             }
-
-            PolygonContainer.DrawPolygon(AlgorithmType);
         }
         else if (EditorMode == EditorMode.MovingControlVertex)
         {
+            // here
+            var copy = new PolygonPosition(PolygonContainer.Polygon!);
             PolygonContainer.MoveSelectedControlVertexWithConstraints(e.Location);
-            PolygonContainer.DrawPolygon(AlgorithmType);
+
+            if (!PolygonContainer.DrawPolygon(AlgorithmType))
+            {
+                copy.RestorePosition(PolygonContainer.Polygon);
+                PolygonContainer.DrawPolygon(AlgorithmType);
+                ShowInvalidPolygonStateMessageBox();
+            }
         }
     }
     private void PictureBox_MouseDown(object sender, MouseEventArgs e)
@@ -554,5 +564,18 @@ public partial class PolygonEditorForm : Form
             MessageBoxButtons.OK,
             MessageBoxIcon.Information
         );
+    }
+
+    private void ShowInvalidPolygonStateMessageBox(bool show = false)
+    {
+        if (show)
+        {
+            MessageBox.Show(
+                "The polygon has reached an invalid state...\nPrevious position has been restored.",
+                "Invalid state",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
+        }
     }
 }

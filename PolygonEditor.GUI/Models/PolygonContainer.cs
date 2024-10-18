@@ -40,20 +40,20 @@ public sealed class PolygonContainer : IDisposable
         var vertex = VertexMovingState.SelectedElement;
         vertex?.MoveWithoutConstraint(dx, dy);
     }
-    public bool MoveSelectedVertexWithConstraints(Point point)
+    public bool MoveSelectedVertexWithConstraints(Point point, bool makeCopy = true)
     {
         var offset = VertexMovingState.UpdateHitPoint(point);
         var vertex = VertexMovingState.SelectedElement;
 
         if (vertex == null) return false;
 
-        if(Polygon != null && Polygon.Edges.All(edge => edge.ConstraintType == EdgeConstraintType.FixedLength))
+        if (Polygon != null && Polygon.Edges.All(edge => edge.ConstraintType == EdgeConstraintType.FixedLength))
         {
             Polygon.MoveWithoutConstraint(offset.x, offset.y);
             return true;
         }
 
-        return Algorithm.MoveVertexWithConstraints(vertex, point.X, point.Y, ref Polygon);
+        return Algorithm.MoveVertexWithConstraints(vertex, point.X, point.Y, makeCopy);
     }
     public void MoveSelectedControlVertex(Point point)
     {
@@ -68,7 +68,7 @@ public sealed class PolygonContainer : IDisposable
 
         if (controlVertex == null) return;
 
-        Algorithm.MoveControlVertexWithConstraints(controlVertex, point.X, point.Y, ref Polygon);
+        Algorithm.MoveControlVertexWithConstraints(controlVertex, point.X, point.Y);
     }
 
     public bool IsVertexHit(Point point, out Vertex? vertex)
@@ -114,13 +114,25 @@ public sealed class PolygonContainer : IDisposable
         return Polygon.IsWithinSelection(point.X, point.Y);
     }
 
-    public void DrawPolygon(AlgorithmType algorithmType)
+    public bool DrawPolygon(AlgorithmType algorithmType)
     {
         using var graphics = Graphics.FromImage(Buffer);
-        DrawPolygonUsingGraphics(graphics, algorithmType);
-        SwapBitmaps();
-        ClearBuffer();
-        PictureBox.Refresh();
+        try
+        {
+            DrawPolygonUsingGraphics(graphics, algorithmType);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        finally
+        {
+            SwapBitmaps();
+            ClearBuffer();
+            PictureBox.Refresh();
+        }
+
+        return true;
     }
     public void DrawPartialPolygon(Point point, AlgorithmType algorithmType)
     {
