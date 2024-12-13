@@ -1,6 +1,6 @@
 # PolygonEditor:
 
-PolygonEditor is a simple Windows Forms application designed for creating and editing polygons.
+_Polygon Editor_ is a simple Windows Forms application designed for creating and editing polygons.
 
 It provides an interactive interface to draw, manipulate, and manage polygons with advanced features such as vertex constraints, edge constraints, and curve transformations.
 
@@ -41,29 +41,29 @@ If the adjustment would require modifying a vertex position set by the user, the
 
 ## Controls:
 
-1. Creating a New Polygon:
+1. **Creating a New Polygon**:
 
 - Right-click on an empty area of the window and select _Create polygon_.
 - Place subsequent vertices on the screen by clicking with the left mouse button.
 - To finish creating the polygon, select the starting vertex.
 - To remove a partially created polygon, press the `Escape` key.
 
-2. Deleting a Polygon:
+2. **Deleting a Polygon**:
 
 - Right-click and select _Delete polygon_.
 
-3. Moving a Polygon:
+3. **Moving a Polygon**:
 
 - Hold down the left mouse button to move the polygon.
 
-4. Vertex Management:
+4. **Vertex Management**:
 
 - Right-click while hovering over a vertex and select the desired option from the context menu.
 - _Delete vertex_ allows you to remove a vertex and its adjacent edges.
 - _Constraints_ lets you select a constraint applied to the vertex (continuity of the Bézier segment with a line segment).
 - To move a vertex, hold down the left mouse button over the vertex.
 
-5. Edge Management:
+5. **Edge Management**:
 
 - Right-click while hovering over an edge and select the desired option from the context menu.
 - _Add vertex_ adds a new vertex at the middle of the edge.
@@ -71,7 +71,7 @@ If the adjustment would require modifying a vertex position set by the user, the
 - _Constraints_ allows you to select a constraint applied to the edge.
 - The constraint will be activated when you move the vertex.
 
-6. Bezier Segment Management:
+6. **Bézier Segment Management**:
 
 - Right-click on the control point to revert the edge back to a straight segment.
 - To move the control point, hold down the left mouse button.
