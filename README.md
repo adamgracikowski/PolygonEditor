@@ -6,6 +6,10 @@ It provides an interactive interface to draw, manipulate, and manage polygons wi
 
 The project was implemented as a part of the Computer Graphics course at Warsaw University of Technology during the winter semester of the 2024-2025 academic year.
 
+<p align="center">
+  <img src="Images/01.PNG"/>
+</p>
+
 ## Features:
 
 - **Drawing and Editing**: Create polygons interactively by clicking to add vertices. Add or remove vertices as needed.
@@ -22,6 +26,10 @@ The project was implemented as a part of the Computer Graphics course at Warsaw 
 - **Save Scene**: Serialize the polygon data to a file.
 - **Load Scene**: Deserialize polygon data from a file to continue editing.
 - **Rendering Options**: Draw polygons using library-provided rendering algorithms or use a custom implementation of Bresenham's algorithm.
+
+<p align="center">
+  <img src="Images/02.PNG"/>
+</p>
 
 ## Constraint Preservation Algorithm:
 
@@ -67,3 +75,7 @@ If the adjustment would require modifying a vertex position set by the user, the
 
 - Right-click on the control point to revert the edge back to a straight segment.
 - To move the control point, hold down the left mouse button.
+
+<p align="center">
+  <img src="Images/03.PNG"/>
+</p>
